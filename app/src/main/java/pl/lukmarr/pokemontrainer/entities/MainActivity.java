@@ -3,6 +3,7 @@ package pl.lukmarr.pokemontrainer.entities;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.trnql.smart.activity.ActivityEntry;
 import com.trnql.smart.base.SmartCompatActivity;
 import com.trnql.smart.location.AddressEntry;
@@ -11,22 +12,16 @@ import com.trnql.smart.people.PersonEntry;
 import com.trnql.smart.places.PlaceEntry;
 import com.trnql.smart.weather.WeatherEntry;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import butterknife.ButterKnife;
-import io.realm.Realm;
 import pl.lukmarr.pokemontrainer.R;
-import pl.lukmarr.pokemontrainer.connection.DataFetcher;
-import pl.lukmarr.pokemontrainer.connection.PokeSpritesManager;
-import pl.lukmarr.pokemontrainer.database.RealmPoke;
-import pl.lukmarr.pokemontrainer.model.Pokemon;
-import rx.functions.Action1;
+import pl.lukmarr.pokemontrainer.utils.MapUtils;
 
 public class MainActivity extends SmartCompatActivity {
     public static final String TAG = MainActivity.class.getSimpleName();
 
+    public LatLng lastLatLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +30,7 @@ public class MainActivity extends SmartCompatActivity {
         ButterKnife.bind(this);
         getAppData().setApiKey("c9ad5f56-8d2b-4c01-9d30-ad6aa477e35c");
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content,PokedexFragment.newInstance()).commitAllowingStateLoss();
+                .replace(R.id.content, MapFragment.newInstance()).commitAllowingStateLoss();
 
 
     }
@@ -74,7 +69,9 @@ public class MainActivity extends SmartCompatActivity {
     protected void smartLatLngChange(LocationEntry location) {
         super.smartLatLngChange(location);
         Log.d(TAG, "smartLatLngChange " + location);
+        this.lastLatLng = MapUtils.asGoogleLatLng(location.getLatLng());
     }
+
 
     @Override
     protected void smartIsHighAccuracy(boolean isHighAcc) {

@@ -4,6 +4,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="trnql_key">c9ad5f56-8d2b-4c01-9d30-ad6aa477e35c</string>
+    <string name="google_key">AIzaSyB2WQ0YEGZF66wbXdDsss3_dzHwYKjSeqU</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
