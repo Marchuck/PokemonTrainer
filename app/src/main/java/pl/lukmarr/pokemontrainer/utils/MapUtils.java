@@ -15,6 +15,7 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import io.realm.Realm;
+import pl.lukmarr.pokemontrainer.config.Config;
 import pl.lukmarr.pokemontrainer.connection.PicassoMarker;
 import pl.lukmarr.pokemontrainer.connection.PokeSpritesManager;
 import pl.lukmarr.pokemontrainer.database.RealmPoke;
@@ -58,12 +59,13 @@ public class MapUtils {
                             .getPokemonIconByNameAndId(poke2.getId(), poke2.getName()))
                             .into(marker);
                     ++j;
+                    if (Config.wasEmpty)
+                        Config.registerNewPokemon(poke, poke2.getId());
 
                 }
                 tripGoogleMap.animateCamera(CameraUpdateFactory
                         .newCameraPosition(new CameraPosition(position, 16, 60, 0)));
-
-
+                Config.wasEmpty = false;
             }
         });
 

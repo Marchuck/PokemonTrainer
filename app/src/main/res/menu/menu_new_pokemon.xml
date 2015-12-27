@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="pl.lukmarr.pokemontrainer.entities.NewPokemonActivity">
+    <item
+        android:id="@+id/action_details"
+        android:orderInCategory="100"
+        android:title="Details"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_pokedex"
+        android:orderInCategory="100"
+        android:title="Pokedex"
+        app:showAsAction="never" />
+</menu>

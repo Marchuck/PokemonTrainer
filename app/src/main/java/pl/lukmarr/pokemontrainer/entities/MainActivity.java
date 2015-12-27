@@ -54,10 +54,16 @@ public class MainActivity extends SmartCompatActivity {
         initDrawer();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content, PokedexFragment.newInstance()).commitAllowingStateLoss();
+
+        startLocationWatcher();
+
+    }
+
+    void startLocationWatcher() {
+
     }
 
     void fetchPokes() {
-        final long time = System.currentTimeMillis();
         List<Integer> ids = new ArrayList<>();
         for (int j = 1; j < 31; j++) {
             ids.add(j);
@@ -130,7 +136,6 @@ public class MainActivity extends SmartCompatActivity {
             case 3:
             default:
                 return new InfoFragment();
-
         }
     }
 
