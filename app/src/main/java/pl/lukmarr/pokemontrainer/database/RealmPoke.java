@@ -9,22 +9,14 @@ import io.realm.annotations.PrimaryKey;
  * @since 25.12.15
  */
 public class RealmPoke extends RealmObject {
-    @PrimaryKey
-    private String uuid;
+
     private int id;
+    @PrimaryKey
     private String name;
     private String image;
     private boolean isDiscovered;
 
     public RealmPoke() {
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
     }
 
     public int getId() {

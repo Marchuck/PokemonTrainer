@@ -2,7 +2,7 @@ package pl.lukmarr.pokemontrainer.entities;
 
 
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +15,10 @@ import pl.lukmarr.pokemontrainer.R;
  * A simple {@link Fragment} subclass.
  */
 public class InfoFragment extends Fragment {
+
+    public static InfoFragment newInstance() {
+        return new InfoFragment();
+    }
 
     public InfoFragment() {
         // Required empty public constructor

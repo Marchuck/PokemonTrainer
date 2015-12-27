@@ -36,14 +36,10 @@ public class MapFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_map, container, false);
         mapUtils = new MapUtils();
-        new android.os.Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                LatLng lastLatLng = ((MainActivity) getActivity()).lastLatLng;
-                LatLng cacheLatLng = new LatLng(50.4265305, 22.6305689);
-                refreshMap(lastLatLng == null ? cacheLatLng : lastLatLng);
-            }
-        }, 1000);
+        LatLng lastLatLng = ((MainActivity) getActivity()).lastLatLng;
+        LatLng cacheLatLng = new LatLng(50.4265305, 22.6305689);
+        refreshMap(lastLatLng == null ? cacheLatLng : lastLatLng);
+
         return v;
     }
 
@@ -53,5 +49,4 @@ public class MapFragment extends Fragment {
             refreshed = true;
         }
     }
-
 }
