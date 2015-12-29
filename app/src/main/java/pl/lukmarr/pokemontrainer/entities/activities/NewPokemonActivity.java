@@ -1,4 +1,4 @@
-package pl.lukmarr.pokemontrainer.entities;
+package pl.lukmarr.pokemontrainer.entities.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,7 @@ import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.realm.Realm;
 import pl.lukmarr.pokemontrainer.R;
 import pl.lukmarr.pokemontrainer.config.Config;
@@ -25,12 +26,16 @@ public class NewPokemonActivity extends AppCompatActivity {
     @Bind(R.id.pokemonImage)
     ImageView pokemonImage;
 
+    @OnClick(R.id.pokemonImage)
+    public void zzx() {
+        onBackPressed();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_pokemon);
         ButterKnife.bind(this);
-        setTitle("New wild pokemon appeared!");
 
         Intent i = getIntent();
         int pokemonId = i.getIntExtra("POKEMON_ID", -1);
@@ -40,6 +45,7 @@ public class NewPokemonActivity extends AppCompatActivity {
         if (pokemonId == -1 || poke == null) {
             finish();
         } else {
+
             title.setText(poke.getName());
             Picasso.with(this).load(poke.getImage()).into(pokemonImage);
         }
@@ -61,9 +67,9 @@ public class NewPokemonActivity extends AppCompatActivity {
         if (id == R.id.action_pokedex) {
             startMainActivity(Config.POKEDEX_FRAGMENT);
             return true;
-        } else if(id==android.R.id.home){
+        } else if (id == android.R.id.home) {
             onBackPressed();
-        }else if (id == R.id.action_details) {
+        } else if (id == R.id.action_details) {
             startMainActivity(Config.DETAILS_FRAGMENT);
             return true;
         }

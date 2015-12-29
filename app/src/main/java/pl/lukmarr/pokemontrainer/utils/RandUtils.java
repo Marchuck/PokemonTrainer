@@ -1,10 +1,16 @@
 package pl.lukmarr.pokemontrainer.utils;
 
+import android.content.Context;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
+import pl.lukmarr.pokemontrainer.database.RealmPoke;
 
 /**
  * Created by Łukasz Marczak
@@ -62,5 +68,19 @@ public class RandUtils {
 
     public int randomPoke() {
         return 1 + random.nextInt(150);
+    }
+
+    public int randomPokeButUnique(Context context) {
+        Realm realm = Realm.getInstance(context);
+        RealmResults<RealmPoke> pokes = realm.where(RealmPoke.class).equalTo("isDiscovered", false).findAll();
+        if (pokes == null || pokes.size() == 0) return -1;
+        List<Integer> indexes = new ArrayList<>();
+        for (int j = 0; j < pokes.size(); j++) {
+            RealmPoke poke = pokes.get(j);
+            indexes.add(poke.getId());
+        }
+        int randomIndex = random.nextInt(indexes.size());
+        realm.close();
+        return indexes.get(randomIndex);
     }
 }

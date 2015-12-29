@@ -2,6 +2,7 @@ package pl.lukmarr.pokemontrainer.utils;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,8 +12,10 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import pl.lukmarr.pokemontrainer.config.Config;
 
@@ -23,6 +26,8 @@ import pl.lukmarr.pokemontrainer.config.Config;
  * @since 26.11.15.
  */
 public final class LocationHelper {
+
+    private static List<BroadcastReceiver> receivers = new ArrayList<>();
     private static LocationHelper INSTANCE;
     public static final String TAG = LocationHelper.class.getSimpleName();
     Activity activity;
@@ -50,14 +55,26 @@ public final class LocationHelper {
             double lon = latLng.longitude;
 
             locationManager.addProximityAlert(lat, lon, Config.RADIUS_IN_METERS,
-                    getExpirationTime(), proximityIntent);
-            IntentFilter filter = new IntentFilter(PROX_ALERT_INTENT);
-            activity.registerReceiver(new ProximityIntentReceiver(pokemonId), filter);
+                    -1, proximityIntent);
+            IntentFilter filter = new IntentFilter(PROX_ALERT_INTENT + pokemonId);
+            ProximityIntentReceiver receiver = new ProximityIntentReceiver(pokemonId);
+            receivers.add(receiver);
+            activity.registerReceiver(receiver, filter);
         } catch (Exception c) {
             Log.e(TAG, "LocationHelper " + c.getMessage());
             c.printStackTrace();
         }
 
+    }
+
+    public static void onDestroy(Activity activity) {
+        if (activity == null) {
+            Log.e(TAG, "onDestroy : activity is null!!!");
+            return;
+        }
+        for (BroadcastReceiver receiver : receivers)
+            activity.unregisterReceiver(receiver);
+        receivers.clear();
     }
 
     public static long getExpirationTime() {

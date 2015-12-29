@@ -11,6 +11,7 @@
     <string name="title_activity_new_pokemon">NewPokemonActivity</string>
     <string name="title_mariusz_list">Mariuszes</string>
     <string name="title_mariusz_detail">Mariusz Detail</string>
+    <string name="about_text">If you have found some bug or just want contact me, you can send me an email:</string>
 
 
 </resources>

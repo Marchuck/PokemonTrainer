@@ -1,4 +1,4 @@
-package pl.lukmarr.pokemontrainer.entities;
+package pl.lukmarr.pokemontrainer.entities.fragments;
 
 
 import android.os.Bundle;
@@ -14,13 +14,13 @@ import pl.lukmarr.pokemontrainer.R;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class InfoFragment extends Fragment {
+public class DetailsFragment extends Fragment {
 
-    public static InfoFragment newInstance() {
-        return new InfoFragment();
+    public static DetailsFragment newInstance() {
+        return new DetailsFragment();
     }
 
-    public InfoFragment() {
+    public DetailsFragment() {
         // Required empty public constructor
     }
 

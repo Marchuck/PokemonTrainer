@@ -2,6 +2,7 @@ package pl.lukmarr.pokemontrainer.connection;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.util.List;
@@ -25,6 +26,7 @@ import rx.schedulers.Schedulers;
  */
 public class DataFetcher {
     public static final String TAG = DataFetcher.class.getSimpleName();
+    public static boolean fetchingInProgress = false;
 
     public DataFetcher() {
     }
@@ -32,13 +34,13 @@ public class DataFetcher {
     public Action0 onSubscribe;
     public Action0 onCompleted;
     public Action1<Throwable> onError;
-//    public Subject<List<Pokemon>, List<Pokemon>> subject = PublishSubject.create();
 
-    public void fetchPokes(final Activity a, List<Integer> ids, final ListCallback<RealmPoke> listener) {
+
+    public void fetchPokes(final Activity a, List<Integer> ids, @Nullable final ListCallback<RealmPoke> listener) {
         Log.d(TAG, "fetchPokes ");
         GenericAdapter<Pokemon> pokemonAdapter = new GenericAdapter<>(PokeService.POKEAPI_ENDPOINT, Pokemon.class);
         final PokeService service = pokemonAdapter.adapter.create(PokeService.class);
-
+        fetchingInProgress = true;
         Observable.from(ids).flatMap(new Func1<Integer, Observable<Pokemon>>() {
             @Override
             public Observable<Pokemon> call(Integer id) {
@@ -54,12 +56,13 @@ public class DataFetcher {
                     public void call(Throwable throwable) {
                         Log.e(TAG, throwable.getMessage());
                         throwable.printStackTrace();
+                        fetchingInProgress = false;
                     }
                 });
 
     }
 
-    public static Action1<List<Pokemon>> receivedListAction1(final Context context, final ListCallback<RealmPoke> listener) {
+    public static Action1<List<Pokemon>> receivedListAction1(final Context context, @Nullable final ListCallback<RealmPoke> listener) {
         return new Action1<List<Pokemon>>() {
             @Override
             public void call(final List<Pokemon> pokemons) {
@@ -75,7 +78,6 @@ public class DataFetcher {
                             String types = PokeUtils.generatePokemonTypes(p);
                             poke.setTypes(types == null ? "unknown" : types);
                             poke.setIsDiscovered(false);
-//                            poke.setImage(PokeSpritesManager.getPokemonFrontByName(p.name));
                             poke.setImage(PokeSpritesManager.getMainPokeByName(p.name));
                             realm.copyToRealmOrUpdate(poke);
                         }
@@ -84,8 +86,8 @@ public class DataFetcher {
                 realm.close();
                 Realm realm1 = Realm.getInstance(context);
                 List<RealmPoke> realmPokeList = realm1.where(RealmPoke.class).findAllSorted("id");
-                listener.onListReceived(realmPokeList);
-
+                if (listener != null) listener.onListReceived(realmPokeList);
+                fetchingInProgress = false;
             }
         };
     }

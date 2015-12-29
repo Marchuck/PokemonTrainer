@@ -15,22 +15,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/toolbar">
+
         <ProgressBar
-            android:visibility="gone"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
             android:id="@+id/progressive"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:visibility="gone" />
 
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/drawer_content"
-        android:layout_width="200sp"
+        android:layout_width="250sp"
         android:layout_height="match_parent"
         android:layout_gravity="left"
-        android:background="@android:color/white"
+        android:background="@color/primary"
         android:scrollbars="vertical">
         <!-- all in drawer -->
 
@@ -39,5 +40,27 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:padding="8sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/right_map_drawer_container"
+        android:layout_width="250sp"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:background="@android:color/white">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_margin="5sp" />
+
+        <RelativeLayout
+            android:id="@+id/right_map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+
     </RelativeLayout>
 </android.support.v4.widget.DrawerLayout>

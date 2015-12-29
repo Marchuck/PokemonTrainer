@@ -23,7 +23,7 @@
         android:theme="@style/AppTheme"
         tools:replace="android:name" >
         <activity
-            android:name=".entities.MainActivity"
+            android:name=".entities.activities.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -53,7 +53,7 @@
             android:value="@string/google_key" />
 
         <activity
-            android:name=".entities.NewPokemonActivity"
+            android:name=".entities.activities.NewPokemonActivity"
             android:label="@string/title_activity_new_pokemon" >
         </activity>
         <activity

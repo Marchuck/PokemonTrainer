@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import pl.lukmarr.pokemontrainer.entities.NewPokemonActivity;
+import pl.lukmarr.pokemontrainer.entities.activities.NewPokemonActivity;
 
 /**
  * Created by Łukasz Marczak

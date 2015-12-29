@@ -19,9 +19,9 @@ import pl.lukmarr.pokemontrainer.adapters.CustomGridViewAdapter;
 import pl.lukmarr.pokemontrainer.database.Achievement;
 import pl.lukmarr.pokemontrainer.utils.GenericTrio;
 
-public class GridViewFragment extends Fragment {
+public class BadgesFragment extends Fragment {
 
-    private static final String TAG = GridViewFragment.class.getSimpleName();
+    private static final String TAG = BadgesFragment.class.getSimpleName();
     @Bind(R.id.achievements_grid_view)
     GridView gridView;
 
@@ -29,14 +29,14 @@ public class GridViewFragment extends Fragment {
 
     CustomGridViewAdapter customGridAdapter;
 
-    public static GridViewFragment newInstance() {
-        GridViewFragment fragment = new GridViewFragment();
+    public static BadgesFragment newInstance() {
+        BadgesFragment fragment = new BadgesFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
 
-    public GridViewFragment() {
+    public BadgesFragment() {
         // Required empty public constructor
     }
 
@@ -55,7 +55,7 @@ public class GridViewFragment extends Fragment {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                RealmResults<Achievement> realmResults = realm.where(Achievement.class).findAllSorted("id");
+                RealmResults<Achievement> realmResults = realm.where(Achievement.class).findAllSorted("message");
                 for (Achievement achievement : realmResults) {
 
                     boolean isUnlocked = achievement.isUnlocked();

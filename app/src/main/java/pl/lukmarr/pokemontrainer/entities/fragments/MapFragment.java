@@ -1,4 +1,4 @@
-package pl.lukmarr.pokemontrainer.entities;
+package pl.lukmarr.pokemontrainer.entities.fragments;
 
 
 import android.os.Bundle;
@@ -22,6 +22,7 @@ import pl.lukmarr.pokemontrainer.R;
 import pl.lukmarr.pokemontrainer.adapters.MessageAdapter;
 import pl.lukmarr.pokemontrainer.database.RealmPoke;
 import pl.lukmarr.pokemontrainer.database.RealmPosition;
+import pl.lukmarr.pokemontrainer.entities.activities.MainActivity;
 import pl.lukmarr.pokemontrainer.utils.MapUtils;
 import pl.lukmarr.pokemontrainer.utils.interfaces.PokemonRefreshable;
 

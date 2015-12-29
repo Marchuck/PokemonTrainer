@@ -1,0 +1,43 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="pl.lukmarr.pokemontrainer.entities.fragments.TrainersFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:id="@+id/trainers_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="10sp"
+        android:padding="20sp"
+        android:text="trainers nearby"
+        android:textColor="@android:color/black"
+        android:textSize="20sp" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:background="@color/primary"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/trainers_text"
+        android:padding="8sp" />
+
+    <ProgressBar
+        android:id="@+id/progressive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:padding="25sp"
+        android:id="@+id/fab_trainers"
+        android:layout_margin="20sp"
+        android:layout_alignRight="@+id/recycler_view"
+        android:layout_alignBottom="@+id/recycler_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+</RelativeLayout>

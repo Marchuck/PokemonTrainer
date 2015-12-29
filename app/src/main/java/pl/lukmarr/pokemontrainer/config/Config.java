@@ -22,13 +22,11 @@ public class Config {
     public static List<Pair<LatLng, Integer>> pokesNearby = new ArrayList<>();
     public static boolean wasEmpty = true;
 
-    public static int MAP_FRAGMENT = 0;
     public static int POKEDEX_FRAGMENT = 1;
-    public static int BADGES_FRAGMENT = 2;
     public static int DETAILS_FRAGMENT = 3;
 
     public static int INCREMENT_POKES = 7;
-    public static Object currentFragmentId = -1;
+    public static int currentFragmentId = -1;
     public static int transparentLayoutHeight = 200;
 
     public static void registerNewPokemon(LatLng poke, int id) {

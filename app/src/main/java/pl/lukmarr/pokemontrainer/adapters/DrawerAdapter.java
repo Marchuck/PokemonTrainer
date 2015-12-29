@@ -14,12 +14,12 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import pl.lukmarr.pokemontrainer.R;
 import pl.lukmarr.pokemontrainer.utils.IntentBuilder;
+import pl.lukmarr.pokemontrainer.utils.RandUtils;
 
 /**
  * Created by Łukasz Marczak
@@ -45,7 +45,9 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.VH> {
         items.add(new Pair<>("Map", android.R.drawable.alert_light_frame));
         items.add(new Pair<>("Pokedex", android.R.drawable.alert_light_frame));
         items.add(new Pair<>("Badges", android.R.drawable.alert_light_frame));
+        items.add(new Pair<>("Trainers nearby", android.R.drawable.alert_light_frame));
         items.add(new Pair<>("Details", android.R.drawable.alert_light_frame));
+        items.add(new Pair<>("About", android.R.drawable.alert_light_frame));
         items.add(new Pair<>("Exit", android.R.drawable.alert_light_frame));
         this.listener = listener;
     }
@@ -72,7 +74,7 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.VH> {
                 if (position == 3) {
                     Log.d("", "onLongClick ");
                     context.startActivity(IntentBuilder
-                            .NewPokemonActivityBuilder(context, 1 + new Random().nextInt(150)));
+                            .NewPokemonActivityBuilder(context, RandUtils.create().randomPokeButUnique(context)));
                 }
                 return false;
             }

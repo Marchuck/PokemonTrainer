@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import pl.lukmarr.pokemontrainer.entities.NewPokemonActivity;
+import pl.lukmarr.pokemontrainer.entities.activities.NewPokemonActivity;
 
 /**
  * Created by lukasz on 26.11.15.
@@ -27,6 +27,8 @@ public class ProximityIntentReceiver extends BroadcastReceiver {
 //        Log.d("productId", "" + productId);
 
         //if (entering) {
+
+
         Intent i = new Intent(context, NewPokemonActivity.class);
         i.putExtra("POKEMON_ID", pokemonId);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
