@@ -1,4 +1,4 @@
-package pl.lukmarr.pokemontrainer.utils;
+package pl.lukmarr.pokemontrainer.utils.interfaces;
 
 import java.util.List;
 

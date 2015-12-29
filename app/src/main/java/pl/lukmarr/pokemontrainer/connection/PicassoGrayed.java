@@ -17,9 +17,13 @@ import com.squareup.picasso.Target;
  */
 public class PicassoGrayed implements Target {
     ImageView imageView;
+    int width = 100;
+    int height = 100;
 
-    public PicassoGrayed(ImageView imageView) {
+    public PicassoGrayed(ImageView imageView, int x, int y) {
         this.imageView = imageView;
+        width = x;
+        height = y;
     }
 
     @Override
@@ -40,7 +44,7 @@ public class PicassoGrayed implements Target {
     @Override
     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
 
-        bitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, false);
+        bitmap = Bitmap.createScaledBitmap(bitmap, width, height, false);
         imageView.setImageDrawable(new BitmapDrawable(bitmap));
         ColorMatrix matrix = new ColorMatrix();
         matrix.setSaturation(0);

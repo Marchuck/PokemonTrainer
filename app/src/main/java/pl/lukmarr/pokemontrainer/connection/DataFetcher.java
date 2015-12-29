@@ -3,22 +3,20 @@ package pl.lukmarr.pokemontrainer.connection;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.List;
 
 import io.realm.Realm;
-import pl.lukmarr.pokemontrainer.config.Config;
 import pl.lukmarr.pokemontrainer.database.RealmPoke;
 import pl.lukmarr.pokemontrainer.model.Pokemon;
-import pl.lukmarr.pokemontrainer.utils.ListCallback;
+import pl.lukmarr.pokemontrainer.utils.PokeUtils;
+import pl.lukmarr.pokemontrainer.utils.interfaces.ListCallback;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
-import rx.subjects.PublishSubject;
-import rx.subjects.Subject;
 
 /**
  * Created by Łukasz Marczak
@@ -26,12 +24,18 @@ import rx.subjects.Subject;
  * @since 25.12.15
  */
 public class DataFetcher {
+    public static final String TAG = DataFetcher.class.getSimpleName();
+
     public DataFetcher() {
     }
 
-    public Subject<List<Pokemon>, List<Pokemon>> subject = PublishSubject.create();
+    public Action0 onSubscribe;
+    public Action0 onCompleted;
+    public Action1<Throwable> onError;
+//    public Subject<List<Pokemon>, List<Pokemon>> subject = PublishSubject.create();
 
-    public void fetch(final Activity a, List<Integer> ids) {
+    public void fetchPokes(final Activity a, List<Integer> ids, final ListCallback<RealmPoke> listener) {
+        Log.d(TAG, "fetchPokes ");
         GenericAdapter<Pokemon> pokemonAdapter = new GenericAdapter<>(PokeService.POKEAPI_ENDPOINT, Pokemon.class);
         final PokeService service = pokemonAdapter.adapter.create(PokeService.class);
 
@@ -40,21 +44,22 @@ public class DataFetcher {
             public Observable<Pokemon> call(Integer id) {
                 return service.getPokemonById(id);
             }
-        }).toList().doOnError(new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                Log.e(Config.rxJavaError, "error");
-                throwable.printStackTrace();
-                Toast.makeText(a, "error to download data", Toast.LENGTH_SHORT).show();
-            }
-        })
-                .subscribeOn(Schedulers.io())
+        }).toList().doOnError(onError)
+                .doOnSubscribe(onSubscribe)
+                .doOnCompleted(onCompleted)
+                .subscribeOn(Schedulers.trampoline())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subject);
+                .subscribe(receivedListAction1(a, listener), new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.e(TAG, throwable.getMessage());
+                        throwable.printStackTrace();
+                    }
+                });
 
     }
 
-    public Action1<List<Pokemon>> receivedListAction1(final Context context,final ListCallback<RealmPoke> listener) {
+    public static Action1<List<Pokemon>> receivedListAction1(final Context context, final ListCallback<RealmPoke> listener) {
         return new Action1<List<Pokemon>>() {
             @Override
             public void call(final List<Pokemon> pokemons) {
@@ -63,10 +68,14 @@ public class DataFetcher {
                     @Override
                     public void execute(Realm realm) {
                         for (Pokemon p : pokemons) {
+                            Log.d(TAG, "saving next poke");
                             RealmPoke poke = new RealmPoke();
                             poke.setName(p.name);
                             poke.setId(p.national_id);
+                            String types = PokeUtils.generatePokemonTypes(p);
+                            poke.setTypes(types == null ? "unknown" : types);
                             poke.setIsDiscovered(false);
+//                            poke.setImage(PokeSpritesManager.getPokemonFrontByName(p.name));
                             poke.setImage(PokeSpritesManager.getMainPokeByName(p.name));
                             realm.copyToRealmOrUpdate(poke);
                         }
@@ -74,9 +83,9 @@ public class DataFetcher {
                 });
                 realm.close();
                 Realm realm1 = Realm.getInstance(context);
-                List<RealmPoke> realmPokeList = realm.where(RealmPoke.class).findAllSorted("id");
+                List<RealmPoke> realmPokeList = realm1.where(RealmPoke.class).findAllSorted("id");
                 listener.onListReceived(realmPokeList);
-                realm1.close();
+
             }
         };
     }

@@ -13,22 +13,30 @@
     <RelativeLayout
         android:id="@+id/content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar">
+        <ProgressBar
+            android:visibility="gone"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:id="@+id/progressive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/drawer_content"
-        android:layout_width="320dp"
+        android:layout_width="200sp"
         android:layout_height="match_parent"
         android:layout_gravity="left"
-        android:background="@android:color/holo_red_light"
+        android:background="@android:color/white"
         android:scrollbars="vertical">
         <!-- all in drawer -->
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"
-            android:layout_width="300sp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:padding="8sp" />
     </RelativeLayout>

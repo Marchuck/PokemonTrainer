@@ -4,11 +4,11 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,18 +18,18 @@ import butterknife.ButterKnife;
 import io.realm.Realm;
 import pl.lukmarr.pokemontrainer.R;
 import pl.lukmarr.pokemontrainer.adapters.PokemonAdapter;
-import pl.lukmarr.pokemontrainer.connection.DataFetcher;
 import pl.lukmarr.pokemontrainer.database.RealmPoke;
-import pl.lukmarr.pokemontrainer.utils.ListCallback;
-import rx.functions.Action1;
+import pl.lukmarr.pokemontrainer.utils.interfaces.PokemonRefreshable;
 
-public class PokedexFragment extends Fragment {
-
+public class PokedexFragment extends Fragment implements PokemonRefreshable {
+    public static final String TAG = PokedexFragment.class.getSimpleName();
     @Bind(R.id.recycler_view)
     RecyclerView recyclerView;
 
     @Bind(R.id.progressive)
     ProgressBar progressive;
+
+    public PokemonAdapter pokemonAdapter;
 
     public static PokedexFragment newInstance() {
         PokedexFragment fragment = new PokedexFragment();
@@ -52,42 +52,37 @@ public class PokedexFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_pokedex, container, false);
         ButterKnife.bind(this, v);
         setupRecyclerView();
-        downloadData();
         return v;
     }
 
-    void downloadData() {
-        showProgress(true);
-        DataFetcher fetcher = ((MainActivity) getActivity()).dataFetcher;
-         fetcher.subject.subscribe(fetcher.receivedListAction1(getActivity(), new ListCallback<RealmPoke>() {
+
+    void showProgress(final boolean s) {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
-            public void onListReceived(List<RealmPoke> list) {
-                recyclerView.setAdapter(new PokemonAdapter(list, getActivity()));
-                showProgress(false);
-            }
-        }), new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                String msg = throwable.getMessage() == null ? "Error occurred" : throwable.getMessage();
-                showProgress(false);
-                Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
-                throwable.printStackTrace();
+            public void run() {
+                progressive.setVisibility(s ? View.VISIBLE : View.GONE);
             }
         });
     }
 
-    void showProgress(boolean s) {
-        progressive.setVisibility(s ? View.VISIBLE : View.GONE);
-    }
-
     void setupRecyclerView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setAdapter(new PokemonAdapter(new ArrayList<RealmPoke>(), getActivity()));
         Realm realm2 = Realm.getInstance(getActivity());
-        realm2.beginTransaction();
         List<RealmPoke> pokes = realm2.where(RealmPoke.class).findAllSorted("id");
-        realm2.commitTransaction();
         pokes = pokes == null ? new ArrayList<RealmPoke>() : pokes;
-        recyclerView.setAdapter(new PokemonAdapter(pokes, getActivity()));
+        Log.d(TAG, "setupRecyclerView with " + pokes.size() + " pokes");
+        pokemonAdapter = new PokemonAdapter(pokes, getActivity(), progressive,recyclerView);
+        recyclerView.setAdapter(pokemonAdapter);
+    }
+
+    @Override
+    public void refreshPokes(final List<RealmPoke> pokes) {
+        Log.d(TAG, "refreshPokes with " + pokes.size() + " pokes");
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                pokemonAdapter.refresh(pokes);
+            }
+        });
     }
 }

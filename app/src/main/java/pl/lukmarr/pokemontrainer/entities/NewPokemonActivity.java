@@ -15,6 +15,7 @@ import butterknife.ButterKnife;
 import io.realm.Realm;
 import pl.lukmarr.pokemontrainer.R;
 import pl.lukmarr.pokemontrainer.config.Config;
+import pl.lukmarr.pokemontrainer.database.AchievementsManager;
 import pl.lukmarr.pokemontrainer.database.RealmPoke;
 
 public class NewPokemonActivity extends AppCompatActivity {
@@ -42,6 +43,9 @@ public class NewPokemonActivity extends AppCompatActivity {
             title.setText(poke.getName());
             Picasso.with(this).load(poke.getImage()).into(pokemonImage);
         }
+        AchievementsManager.unlockPokemon(this, pokemonId);
+
+        AchievementsManager.checkAchievements(this);
     }
 
     @Override
@@ -53,10 +57,13 @@ public class NewPokemonActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+
         if (id == R.id.action_pokedex) {
             startMainActivity(Config.POKEDEX_FRAGMENT);
             return true;
-        } else if (id == R.id.action_details) {
+        } else if(id==android.R.id.home){
+            onBackPressed();
+        }else if (id == R.id.action_details) {
             startMainActivity(Config.DETAILS_FRAGMENT);
             return true;
         }

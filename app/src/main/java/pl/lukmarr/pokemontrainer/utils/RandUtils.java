@@ -19,6 +19,24 @@ public class RandUtils {
     }
 
     public List<LatLng> getPokesNearby(LatLng latLng, int count) {
+
+        List<LatLng> pairs = new ArrayList<>();
+
+        for (int j = 0; j < count; j++) {
+            double radius = random.nextInt(100);
+            radius /= 8000;
+            int angle = random.nextInt(360);
+
+            double lat = latLng.latitude + radius * Math.sin(Math.toRadians(angle));
+            double lon = latLng.longitude + radius * Math.cos(Math.toRadians(angle));
+//            double lon = latLng.longitude + offset();
+            pairs.add(new LatLng(lat, lon));
+        }
+        return pairs;
+
+    }
+
+    public List<LatLng> getPokesNearby2(LatLng latLng, int count) {
         List<LatLng> pairs = new ArrayList<>();
 
         for (int j = 0; j < count; j++) {
@@ -34,11 +52,15 @@ public class RandUtils {
         while (d > 0.01) {
             d /= 2;
         }
-        d = (random.nextBoolean() ? -d : d);
+        d = (random.nextBoolean() ? -d : d) / 7;
         return d;
     }
 
     public static RandUtils create() {
         return new RandUtils();
+    }
+
+    public int randomPoke() {
+        return 1 + random.nextInt(150);
     }
 }

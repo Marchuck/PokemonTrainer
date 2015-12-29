@@ -14,9 +14,18 @@ public class RealmPoke extends RealmObject {
     @PrimaryKey
     private String name;
     private String image;
+    private String types;
     private boolean isDiscovered;
 
     public RealmPoke() {
+    }
+
+    public String getTypes() {
+        return types;
+    }
+
+    public void setTypes(String types) {
+        this.types = types;
     }
 
     public int getId() {

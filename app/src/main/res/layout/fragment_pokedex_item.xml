@@ -1,14 +1,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/holo_red_light"
-    tools:context="pl.lukmarr.pokemontrainer.entities.PokedexFragment">
+     tools:context="pl.lukmarr.pokemontrainer.entities.PokedexFragment">
     <ImageView
         android:id="@+id/image"
         android:layout_width="100sp"
         android:layout_height="100sp" />
     <TextView
         android:padding="10sp"
+        android:textColor="@android:color/black"
         android:layout_centerVertical="true"
         android:textSize="20sp"
         android:text="Pikachu"

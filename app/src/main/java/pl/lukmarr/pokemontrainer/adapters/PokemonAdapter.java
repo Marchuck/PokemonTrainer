@@ -1,10 +1,9 @@
 package pl.lukmarr.pokemontrainer.adapters;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,31 +20,50 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import pl.lukmarr.pokemontrainer.R;
-import pl.lukmarr.pokemontrainer.connection.PicassoGrayed;
+import pl.lukmarr.pokemontrainer.config.Config;
+import pl.lukmarr.pokemontrainer.connection.DataFetcher;
+import pl.lukmarr.pokemontrainer.connection.UIAction;
+import pl.lukmarr.pokemontrainer.connection.UIError;
 import pl.lukmarr.pokemontrainer.database.RealmPoke;
+import pl.lukmarr.pokemontrainer.utils.interfaces.ListCallback;
 
 
 public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.ItemViewHolder> {
     public static final String TAG = PokemonAdapter.class.getSimpleName();
     List<RealmPoke> mItems = new ArrayList<>();
     ColorMatrixColorFilter filter;
-    Context context;
+    Activity activity;
 
-    private void setupGrayMatrix() {
-        ColorMatrix matrix = new ColorMatrix();
-        matrix.setSaturation(0);
-        filter = new ColorMatrixColorFilter(matrix);
+    DataFetcher morePokesFetcher;
+    View progressView, recyclerView;
+
+    public PokemonAdapter(@NonNull List<RealmPoke> dataSet, @NonNull Activity context,
+                          @NonNull View progressView, @NonNull View recyclerView) {
+        mItems.addAll(dataSet);
+        this.activity = context;
+        this.progressView = progressView;
+        this.recyclerView = recyclerView;
+        morePokesFetcher = new DataFetcher();
+        setHasStableIds(false);
     }
 
-    public PokemonAdapter(@NonNull List<RealmPoke> dataSet, @NonNull Activity context) {
+    public void refresh(@NonNull List<RealmPoke> dataSet) {
+        Log.d(TAG, "refresh with" + dataSet.size() + " pokes");
+        mItems.clear();
         mItems.addAll(dataSet);
-        this.context = context;
+        notifyItemRangeChanged(0, getItemCount());
+        notifyDataSetChanged();
+    }
 
+    @Override
+    public int getItemCount() {
+        return mItems.size();
     }
 
     @Override
     public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_pokedex_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_pokedex_item,
+                parent, false);
         return new ItemViewHolder(view);
     }
 
@@ -53,21 +71,53 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.ItemView
     @Override
     public void onBindViewHolder(final ItemViewHolder holder, final int position) {
         RealmPoke pokemon = mItems.get(position);
-        if (!pokemon.isDiscovered()) {
-            PicassoGrayed gr  = new PicassoGrayed(holder.image);
-            Picasso.with(context).load(pokemon.getImage()).into(gr);
-            holder.name.setText("???");
-            Log.d(TAG, "onBindViewHolder " + position + ", " + pokemon.getName());
-        }else{
-            Picasso.with(context).load(pokemon.getImage()).fit().into(holder.image);
+
+        Log.d(TAG, "onBindViewHolder " + position + ", " + pokemon.getName());
+
+
+        if (pokemon.isDiscovered()) {
+            Picasso.with(activity).load(pokemon.getImage()).fit().into(holder.image);
             holder.name.setText(pokemon.getName());
+        } else {
+//            PicassoGrayed gr = new PicassoGrayed(holder.image, 100, 100);
+//            Picasso.with(activity).load(pokemon.getImage()).resize(100, 100)
+//                    .into(gr);
+            Picasso.with(activity).load(R.drawable.question_mark).fit().into(holder.image);
+            holder.name.setText("Undiscovered");
+        }
+
+
+        //load more pokemons
+        if (position == 150) {
+            progressView.setVisibility(View.GONE);
+            Snackbar.make(recyclerView, "No more pokes in demo version!", Snackbar.LENGTH_SHORT).show();
+        } else if (position < 151 && position == mItems.size() - 1) {
+            fetchMorePokes(position);
         }
     }
 
-    @Override
-    public int getItemCount() {
-        return mItems.size();
+    private void fetchMorePokes(int position) {
+        Log.d(TAG, "fetchMorePokes ");
+        List<Integer> morePokes = new ArrayList<>();
+        int defaultSize = position + 1 + Config.INCREMENT_POKES;
+        int maxSize = defaultSize < 152 ? defaultSize : 152;
+        for (int j = position + 1; j < maxSize; j++)
+            morePokes.add(j);
+        if (morePokes.size() == 0) return;
+        morePokesFetcher.onError = new UIError(activity);
+        morePokesFetcher.onSubscribe = new UIAction(activity, progressView, true);
+        morePokesFetcher.onCompleted = new UIAction(activity, progressView, false);
+        morePokesFetcher.fetchPokes(activity, morePokes, new ListCallback<RealmPoke>() {
+            @Override
+            public void onListReceived(List<RealmPoke> list) {
+                mItems.clear();
+                mItems.addAll(list);
+                notifyItemRangeChanged(0, getItemCount());
+                notifyDataSetChanged();
+            }
+        });
     }
+
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.image)
