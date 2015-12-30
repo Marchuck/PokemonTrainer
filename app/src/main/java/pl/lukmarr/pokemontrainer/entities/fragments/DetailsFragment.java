@@ -46,10 +46,10 @@ public class DetailsFragment extends Fragment {
     public void seeWeather() {
         String weatherMessage = "Weather unavailable";
         WeatherEntry weatherEntry = fromMain().weather;
-        if(weatherEntry!=null)
+        if (weatherEntry != null)
             weatherMessage = weatherEntry.getWeatherSummaryAsString();
 
-            new WeatherDisplayer(getActivity(), weatherMessage);
+        new WeatherDisplayer(getActivity(), weatherMessage);
     }
 
     @Bind(R.id.clearDataFAB)
@@ -90,7 +90,7 @@ public class DetailsFragment extends Fragment {
             public void afterOk(final String newUserName) {
                 int length = newUserName.trim().length();
                 if (length < 3 || length > 30) {
-                    safeMessage("Enter valid name!");
+                    safeMessage(DetailsFragment.this,"Enter valid name!");
                     showChangeNameDialog();
                     return;
                 }
@@ -100,7 +100,7 @@ public class DetailsFragment extends Fragment {
                 new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        safeMessage("Hello, " + newUserName + "!");
+                        safeMessage(DetailsFragment.this,"Hello, " + newUserName + "!");
                         fromMain().refreshLeftDrawer();
                     }
                 }, 400);
@@ -113,9 +113,9 @@ public class DetailsFragment extends Fragment {
         }).prepare(getActivity()).show();
     }
 
-    private void safeMessage(String s) {
-        View view = getView();
-        Activity activity = getActivity();
+    public static void safeMessage(Fragment f, String s) {
+        View view = f.getView();
+        Activity activity = f.getActivity();
         if (view != null)
             Snackbar.make(view, s, Snackbar.LENGTH_SHORT).show();
         else if (activity != null) {

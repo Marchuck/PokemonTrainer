@@ -99,6 +99,8 @@ public class TrainersFragment extends Fragment implements DrawerConnector {
                     public void run() {
                         trainersAdapter.refresh(fromMain().lastPeople);
                         swipeLayout.setRefreshing(false);
+                        if (trainersAdapter.dataSet == null || trainersAdapter.dataSet.size() == 0)
+                            DetailsFragment.safeMessage(TrainersFragment.this, "No trainers nearby!");
                     }
                 }, 500);
             }
