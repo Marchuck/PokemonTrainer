@@ -11,4 +11,6 @@ import java.util.List;
  */
 public interface PersonConnector {
     void onPersonReceived(List<PersonEntry> personEntries);
+    void closeDrawer();
+    boolean isDrawerOpened();
 }

@@ -2,12 +2,8 @@ package pl.lukmarr.pokemontrainer.entities.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -20,14 +16,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.trnql.smart.activity.ActivityEntry;
 import com.trnql.smart.base.SmartCompatActivity;
 import com.trnql.smart.location.AddressEntry;
@@ -41,7 +31,6 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import pl.lukmarr.pokemontrainer.R;
@@ -75,79 +64,21 @@ public class MainActivity extends SmartCompatActivity {
     public SupportMapFragment rightMapFragment;
     public LatLng lastLatLng;
 
-    @Bind(R.id.fab_main)
-    FloatingActionButton fabCloseDrawers;
-
-    @OnClick(R.id.fab_main)
-    public void onFabClick() {
-        drawerLayout.closeDrawers();
-    }
-
-    public void openMapDrawer(final @Nullable List<PersonEntry> entries, final View view) {
-        if (entries == null || entries.size() == 0) {
-            if (view != null && view.isShown())
-                Snackbar.make(view, "No trainers nearby!", Snackbar.LENGTH_SHORT)
-                        .setAction("OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-//                            pers
-//                            PersonEntry ent = new PersonEntry();
-//                            openMapDrawer(ent,view);
-                            }
-                        }).show();
-//            return;
-        }
-        if (rightMapFragment == null) {
-            rightMapFragment = SupportMapFragment.newInstance();
-        }
-        //attach mapFragment to ViewHolder
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.right_map, rightMapFragment).commitAllowingStateLoss();
-        drawerLayout.openDrawer(Gravity.RIGHT);
-        rightMapFragment.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap googleMap) {
-
-                googleMap.setMyLocationEnabled(true);
-                int size = entries == null ? 0 : entries.size();
-                double meanLat = 0;
-                double meanLon = 0;
-                if (size > 0)
-                    for (PersonEntry personEntry : entries) {
-                        double lat = personEntry.getLatitude();
-                        double lon = personEntry.getLongitude();
-
-                        LatLng position = new LatLng(lat, lon);
-                        String personName = personEntry.getDataPayload();
-                        googleMap.addMarker(new MarkerOptions()
-                                .position(position)
-                                .title(personName)
-                                .snippet(personEntry.getDistanceFromUser() + " meters away")
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker)));
-                        meanLat += lat;
-                        meanLon += lon;
-                    }
-                LatLng positionMean = null;
-                if (size > 0)
-                    positionMean = new LatLng(meanLat / size, meanLon / size);
-                else positionMean = lastLatLng;
-                if (positionMean == null) return;
-                googleMap.animateCamera(CameraUpdateFactory
-                        .newCameraPosition(new CameraPosition(positionMean, 16, 60, 0)));
-            }
-        });
-    }
 
     @Bind(R.id.drawer_layout)
     DrawerLayout drawerLayout;
+//
+//    @Bind(R.id.right_map_drawer_container)
+//    RelativeLayout rightDrawerContainer;
+
     @Bind(R.id.recycler_view)
     RecyclerView recyclerView;
     @Bind(R.id.progressive)
     ProgressBar progressView;
     @Bind(R.id.toolbar)
-    android.support.v7.widget.Toolbar toolbar;
+    public android.support.v7.widget.Toolbar toolbar;
 
-    ActionBarDrawerToggle toggle;
+    public ActionBarDrawerToggle toggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,7 +89,6 @@ public class MainActivity extends SmartCompatActivity {
         getAppData().setApiKey("c9ad5f56-8d2b-4c01-9d30-ad6aa477e35c");
         handleNoInternetConnection();
         initDrawer();
-        initFab();
         switchTo(-1);
 //        getSupportFragmentManager().beginTransaction()
 //                .replace(R.id.content, PokedexFragment.newInstance()).commitAllowingStateLoss();
@@ -167,13 +97,6 @@ public class MainActivity extends SmartCompatActivity {
 
     }
 
-    public void initFab() {
-        int color = getResources().getColor(R.color.accent_color);
-        int whenPressedColor = getResources().getColor(R.color.accent_color_darker);
-        fabCloseDrawers.setImageResource(R.drawable.arrow_right);
-        fabCloseDrawers.setBackgroundTintList(ColorStateList.valueOf(color));
-        fabCloseDrawers.setRippleColor(whenPressedColor);
-    }
 
     private void setupRealm() {
         RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(this)
@@ -237,29 +160,19 @@ public class MainActivity extends SmartCompatActivity {
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                if (drawerView.getId() == R.id.right_map_drawer_container) {
-                    Log.d(TAG, "onDrawerOpened XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-//                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN);
-                    openMapDrawer(null, drawerView);
-                }
-//                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN);
+                Log.d(TAG, "onDrawerOpened " + drawerView.getId());
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                if (drawerView.getId() == R.id.right_map_drawer_container) {
-                    Log.d(TAG, "onDrawerClosed XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-//                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-                }
-//                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             }
-        }; // drawerLayout Toggle Object Made
+        };
+
         drawerLayout.setDrawerListener(toggle); // drawerLayout Listener set to the drawerLayout toggle
         toggle.syncState();
         toggle.setDrawerIndicatorEnabled(false);
         drawerLayout.closeDrawer(Gravity.LEFT);
-        drawerLayout.closeDrawer(Gravity.RIGHT);
 //        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(DrawerAdapter.create(this, new DrawerAdapter.Listener() {
@@ -358,12 +271,18 @@ public class MainActivity extends SmartCompatActivity {
     @Override
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(Gravity.LEFT)) {
+            Log.d(TAG, "closing left drawer");
             drawerLayout.closeDrawer(Gravity.LEFT);
-        } else if (drawerLayout.isDrawerOpen(drawerLayout)) {
-            drawerLayout.closeDrawers();
-        } else if (Config.currentFragmentId != -1)
+        } else if (personConnector != null && personConnector.isDrawerOpened()) {
+            Log.d(TAG, "closing right drawer");
+            personConnector.closeDrawer();
+        } else if (Config.currentFragmentId != -1) {
+            Log.d(TAG, "switch to -1");
             switchTo(-1);
-        super.onBackPressed();
+        } else {
+            Log.d(TAG, "onBackPressed ");
+            super.onBackPressed();
+        }
     }
 
     @Override

@@ -3,16 +3,30 @@ package pl.lukmarr.pokemontrainer.entities.fragments;
 
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.trnql.smart.people.PersonEntry;
 
 import java.util.List;
@@ -31,6 +45,12 @@ import pl.lukmarr.pokemontrainer.utils.interfaces.PersonConnector;
  */
 public class TrainersFragment extends Fragment implements PersonConnector {
     public static final String TAG = TrainersFragment.class.getSimpleName();
+    SupportMapFragment rightMapFragment;
+    @Bind(R.id.drawer_layout_trainers)
+    DrawerLayout drawerLayout;
+
+    @Bind(R.id.right_map_drawer_container)
+    RelativeLayout mapContainer;
 
     @Bind(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -44,9 +64,8 @@ public class TrainersFragment extends Fragment implements PersonConnector {
     @OnClick(R.id.fab_trainers)
     public void fab_trainersClick() {
         if (trainersAdapter == null) return;
-
         List<PersonEntry> entries = trainersAdapter.dataSet;
-        ((MainActivity) getActivity()).openMapDrawer(entries, fab_trainers);
+        openMapDrawer(entries, fab_trainers);
     }
 
     public TrainersAdapter trainersAdapter;
@@ -71,8 +90,114 @@ public class TrainersFragment extends Fragment implements PersonConnector {
         fab_trainers.setImageResource(R.drawable.many_markers);
         fab_trainers.setBackgroundTintList(ColorStateList.valueOf(color));
         fab_trainers.setRippleColor(whenPressedColor);
-
+        initDrawer();
         return v;
+    }
+
+    public void openMapDrawer(final @Nullable List<PersonEntry> entries, final View view) {
+        if (entries == null || entries.size() == 0) {
+            if (view != null && view.isShown())
+                Snackbar.make(view, "No trainers nearby!", Snackbar.LENGTH_SHORT)
+                        .setAction("OK", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+//                            pers
+//                            PersonEntry ent = new PersonEntry();
+//                            openMapDrawer(ent,view);
+                            }
+                        }).show();
+        }
+        if (rightMapFragment == null) {
+            rightMapFragment = SupportMapFragment.newInstance();
+        }
+        //prevent of multi-kulti code-generated fabs
+//        mapContainer.removeAllViews();
+        //attach mapFragment to ViewHolder
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.right_map_drawer_container, rightMapFragment).commitAllowingStateLoss();
+        drawerLayout.openDrawer(Gravity.RIGHT);
+        rightMapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                setupBackFab();
+
+                googleMap.setMyLocationEnabled(true);
+                int size = entries == null ? 0 : entries.size();
+                double meanLat = 0;
+                double meanLon = 0;
+                if (size > 0)
+                    for (PersonEntry personEntry : entries) {
+                        double lat = personEntry.getLatitude();
+                        double lon = personEntry.getLongitude();
+
+                        LatLng position = new LatLng(lat, lon);
+                        String personName = personEntry.getDataPayload();
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(position)
+                                .title(personName)
+                                .snippet(personEntry.getDistanceFromUser() + " meters away")
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker)));
+                        meanLat += lat;
+                        meanLon += lon;
+                    }
+                LatLng positionMean;
+                if (size > 0)
+                    positionMean = new LatLng(meanLat / size, meanLon / size);
+                else positionMean = ((MainActivity) getActivity()).lastLatLng;
+                if (positionMean == null) return;
+                googleMap.animateCamera(CameraUpdateFactory
+                        .newCameraPosition(new CameraPosition(positionMean, 16, 60, 0)));
+            }
+        });
+    }
+
+    private void setupBackFab() {
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(70, 70);
+        params.addRule(RelativeLayout.CENTER_VERTICAL);
+        params.setMargins(0, 0, 0, 0);
+        FloatingActionButton fab = new FloatingActionButton(getActivity());
+        int color = getResources().getColor(R.color.accent_color);
+        int whenPressedColor = getResources().getColor(R.color.accent_color_darker);
+        fab.setImageResource(R.drawable.arrow_right);
+        fab.setBackgroundTintList(ColorStateList.valueOf(color));
+        fab.setRippleColor(whenPressedColor);
+        mapContainer.addView(fab, params);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.closeDrawer(Gravity.RIGHT);
+            }
+        });
+    }
+
+    MainActivity fromMain() {
+        return ((MainActivity) getActivity());
+    }
+
+    private void initDrawer() {
+        Log.d(TAG, "initDrawer() called with: " + "");
+        android.support.v7.widget.Toolbar toolbar = fromMain().toolbar;
+
+        android.support.v7.app.ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(getActivity(),
+                drawerLayout, toolbar, android.R.string.ok, android.R.string.no) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                Log.d(TAG, "onDrawerOpened " + drawerView.getId());
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            }
+        };
+
+        drawerLayout.setDrawerListener(toggle);
+        toggle.syncState();
+        toggle.setDrawerIndicatorEnabled(false);
+        drawerLayout.closeDrawer(Gravity.RIGHT);
     }
 
     @Override
@@ -80,5 +205,15 @@ public class TrainersFragment extends Fragment implements PersonConnector {
         Log.d(TAG, "onPersonReceived ");
         trainersAdapter.refresh(personEntries);
         TrainerManager.setup(getActivity(), "productName", "payload");
+    }
+
+    @Override
+    public void closeDrawer() {
+        drawerLayout.closeDrawer(Gravity.RIGHT);
+    }
+
+    @Override
+    public boolean isDrawerOpened() {
+        return drawerLayout.isDrawerOpen(Gravity.RIGHT);
     }
 }

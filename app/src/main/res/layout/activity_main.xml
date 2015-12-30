@@ -42,25 +42,23 @@
             android:padding="8sp" />
     </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/right_map_drawer_container"
-        android:layout_width="250sp"
-        android:layout_height="match_parent"
-        android:layout_gravity="right"
-        android:background="@android:color/white">
+    <!--<RelativeLayout-->
+        <!--android:id="@+id/right_map_drawer_container"-->
+        <!--android:layout_width="250sp"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_gravity="right"-->
+        <!--android:background="@android:color/white"-->
+        <!--android:visibility="visible">-->
+        <!--&lt;!&ndash;<RelativeLayout&ndash;&gt;-->
+        <!--&lt;!&ndash;android:id="@+id/right_map"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_height="match_parent"/>&ndash;&gt;-->
+        <!--<android.support.design.widget.FloatingActionButton-->
+            <!--android:id="@+id/fab_main"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:layout_margin="5sp" />-->
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_main"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_margin="5sp" />
-
-        <RelativeLayout
-            android:id="@+id/right_map"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-
-    </RelativeLayout>
+    <!--</RelativeLayout>-->
 </android.support.v4.widget.DrawerLayout>
