@@ -46,8 +46,12 @@ public class DataFetcher {
             public Observable<Pokemon> call(Integer id) {
                 return service.getPokemonById(id);
             }
-        }).toList().doOnError(onError)
-                .doOnSubscribe(onSubscribe)
+        }).toList().doOnError(new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+
+            }
+        }).doOnSubscribe(onSubscribe)
                 .doOnCompleted(onCompleted)
                 .subscribeOn(Schedulers.trampoline())
                 .observeOn(AndroidSchedulers.mainThread())

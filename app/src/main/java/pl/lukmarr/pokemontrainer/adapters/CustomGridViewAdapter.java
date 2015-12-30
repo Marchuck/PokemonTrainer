@@ -2,6 +2,8 @@ package pl.lukmarr.pokemontrainer.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -17,8 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pl.lukmarr.pokemontrainer.R;
-import pl.lukmarr.pokemontrainer.connection.PicassoGrayed;
-import pl.lukmarr.pokemontrainer.utils.GenericTrio;
+import pl.lukmarr.pokemontrainer.utils.Triple;
 
 /**
  * Created by Łukasz Marczak
@@ -26,13 +27,17 @@ import pl.lukmarr.pokemontrainer.utils.GenericTrio;
  * @since 29.12.15
  */
 
-public class CustomGridViewAdapter extends ArrayAdapter<GenericTrio<Boolean, Integer, String>> {
+public class CustomGridViewAdapter extends ArrayAdapter<Triple<Boolean, Integer, String>> {
     Context context;
-    int layoutResourceId;
-    List<GenericTrio<Boolean, Integer, String>> data = new ArrayList<>();
+    final int layoutResourceId;
+
+    /**
+     *
+     */
+    List<Triple<Boolean, Integer, String>> data = new ArrayList<>();
 
     public CustomGridViewAdapter(Context context, @LayoutRes int layoutResourceId,
-                                 @NonNull List<GenericTrio<Boolean, Integer, String>> data) {
+                                 @NonNull List<Triple<Boolean, Integer, String>> data) {
         super(context, layoutResourceId, data);
         this.layoutResourceId = layoutResourceId;
         this.context = context;
@@ -44,26 +49,27 @@ public class CustomGridViewAdapter extends ArrayAdapter<GenericTrio<Boolean, Int
         View row = convertView;
         RecordHolder holder;
 
-        if (row == null) {
-            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-            row = inflater.inflate(layoutResourceId, parent, false);
+//        if (row == null) {
+        LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+        row = inflater.inflate(layoutResourceId, parent, false);
 
-            holder = new RecordHolder();
-            holder.txtTitle = (TextView) row.findViewById(R.id.item_text);
-            holder.imageItem = (ImageView) row.findViewById(R.id.item_image);
-            row.setTag(holder);
-        } else {
-            holder = (RecordHolder) row.getTag();
-        }
+        holder = new RecordHolder();
+        holder.txtTitle = (TextView) row.findViewById(R.id.item_text);
+        holder.imageItem = (ImageView) row.findViewById(R.id.item_image);
+        row.setTag(holder);
+//        } else {
+//            holder = (RecordHolder) row.getTag();
+//        }
 
-        GenericTrio<Boolean, Integer, String> item = data.get(position);
+        Triple<Boolean, Integer, String> item = data.get(position);
         holder.txtTitle.setText(item.third);
+        Picasso.with(context).load(item.second).into(holder.imageItem);
 
-        if (item.first) {
-            Picasso.with(context).load(item.second).into(holder.imageItem);
-        } else {
-            PicassoGrayed grayed = new PicassoGrayed(holder.imageItem, 80, 80);
-            Picasso.with(context).load(item.second).into(grayed);
+        if (!item.first) {
+            ColorMatrix matrix = new ColorMatrix();
+            matrix.setSaturation(0);
+            holder.imageItem.setColorFilter(new ColorMatrixColorFilter(matrix));
+            holder.imageItem.setImageAlpha(90);
         }
         return row;
     }

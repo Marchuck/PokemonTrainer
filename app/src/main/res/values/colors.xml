@@ -6,6 +6,7 @@
     <color name="accent_color_darker">#c0315a</color>
     <color name="primary">#4894ff</color>
     <color name="smoothlyDarker">#4081e3</color>
-    <color name="primaryDark">#006bff</color>
+    <color name="primaryDark">#1565c0</color>
+    <color name="primaryDarkest">#0d47a1</color>
 
 </resources>

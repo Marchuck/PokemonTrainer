@@ -56,18 +56,7 @@
             android:name=".entities.activities.NewPokemonActivity"
             android:label="@string/title_activity_new_pokemon" >
         </activity>
-        <activity
-            android:name=".entities.fragments.MariuszListActivity"
-            android:label="@string/title_mariusz_list" >
-        </activity>
-        <activity
-            android:name=".entities.fragments.MariuszDetailActivity"
-            android:label="@string/title_mariusz_detail"
-            android:parentActivityName=".entities.fragments.MariuszListActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="pl.lukmarr.pokemontrainer.entities.fragments.MariuszListActivity" />
-        </activity>
+
     </application>
 
 </manifest>

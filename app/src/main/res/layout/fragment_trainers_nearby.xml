@@ -4,10 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="pl.lukmarr.pokemontrainer.entities.fragments.TrainersFragment">
+        android:layout_height="match_parent">
 
         <!-- TODO: Update blank fragment layout -->
         <TextView
@@ -17,17 +17,23 @@
             android:layout_centerHorizontal="true"
             android:layout_margin="10sp"
             android:padding="20sp"
-            android:text="trainers nearby"
-            android:textColor="@android:color/black"
+            android:text="Trainers nearby"
+            android:textColor="@android:color/white"
             android:textSize="20sp" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipeLayout"
             android:layout_below="@+id/trainers_text"
-            android:background="@color/primary"
-            android:padding="8sp" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/primary"
+                android:padding="8sp" />
+        </android.support.v4.widget.SwipeRefreshLayout>
 
         <ProgressBar
             android:id="@+id/progressive"
@@ -41,8 +47,8 @@
             android:id="@+id/fab_trainers"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/recycler_view"
-            android:layout_alignRight="@+id/recycler_view"
+            android:layout_alignBottom="@+id/swipeLayout"
+            android:layout_alignRight="@+id/swipeLayout"
             android:layout_margin="20sp"
             android:padding="25sp" />
     </RelativeLayout>
@@ -53,16 +59,5 @@
         android:layout_height="match_parent"
         android:layout_gravity="right"
         android:background="@android:color/white"
-        android:scrollbars="vertical">
-        <!--<RelativeLayout-->
-        <!--android:id="@+id/right_map"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"/>-->
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_main"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_margin="5sp" />
-    </RelativeLayout>
+        android:scrollbars="vertical"/>
 </android.support.v4.widget.DrawerLayout>

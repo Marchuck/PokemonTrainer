@@ -1,6 +1,8 @@
 package pl.lukmarr.pokemontrainer.utils;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -13,7 +15,8 @@ import pl.lukmarr.pokemontrainer.database.Achievement;
 import pl.lukmarr.pokemontrainer.database.OutdoorPoke;
 import pl.lukmarr.pokemontrainer.database.RealmPoke;
 import pl.lukmarr.pokemontrainer.model.Pokemon;
-import pl.lukmarr.pokemontrainer.model.Type;
+import pl.lukmarr.pokemontrainer.model.PokeDetail;
+import pl.lukmarr.pokemontrainer.utils.interfaces.ObjectCallback;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -33,14 +36,14 @@ public class PokeUtils {
 
     public static String generatePokemonTypes(Pokemon pokemon) {
         String types = "";
-        for (Type type : pokemon.types) {
+        for (PokeDetail type : pokemon.types) {
             types += type.name + "&";
         }
         d(TAG, "generatePokemonTypes " + types);
         return types;
     }
 
-    public static void resetGame(final Activity context, View view) {
+    public static void resetGame(final Activity context, @Nullable View view,final @NonNull ObjectCallback<Boolean> callback) {
 
         rx.Observable.create(new rx.Observable.OnSubscribe<Boolean>() {
             @Override
@@ -67,10 +70,12 @@ public class PokeUtils {
                 realm.commitTransaction();
 
                 RealmResults<Achievement> achievements = realm.where(Achievement.class).findAll();
+                realm.beginTransaction();
                 for (int j = 0; j < achievements.size(); j++) {
                     Achievement achievement = achievements.get(j);
                     achievement.setUnlocked(false);
                 }
+                realm.commitTransaction();
 
                 subscriber.onNext(true);
                 subscriber.onCompleted();
@@ -83,12 +88,14 @@ public class PokeUtils {
                     @Override
                     public void call(Boolean aBoolean) {
                         Toast.makeText(context, "Game cleared!", Toast.LENGTH_SHORT).show();
+                        callback.onObjectReceived(true);
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
                         Log.e(TAG, "call " + throwable.getMessage());
                         throwable.printStackTrace();
+                        callback.onObjectReceived(false);
                     }
                 });
     }

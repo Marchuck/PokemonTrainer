@@ -1,9 +1,52 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="pl.lukmarr.pokemontrainer.entities.fragments.DetailsFragment">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primaryDarkest"
+    tools:context="pl.lukmarr.pokemontrainer.entities.fragments.DetailsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true">
 
-</FrameLayout>
+        <TextView
+            android:id="@+id/weatherTitle"
+            style="@style/centerStyle"
+            android:layout_marginTop="40sp"
+            android:paddingTop="30sp"
+            android:text="See weather" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/weatherFAB"
+            style="@style/centerStyle"
+            android:layout_below="@+id/weatherTitle"
+            android:src="@drawable/weather_sunny" />
+
+        <TextView
+            android:id="@+id/changeNameTitle"
+            style="@style/centerStyle"
+            android:layout_below="@+id/weatherFAB"
+            android:layout_marginTop="40sp"
+            android:paddingTop="30sp"
+            android:text="Change name" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/changeNameFAB"
+            style="@style/centerStyle"
+            android:layout_below="@+id/changeNameTitle"
+            android:src="@drawable/pencil" />
+
+        <TextView
+            android:id="@+id/dangerZoneTitle"
+            style="@style/centerStyle"
+            android:layout_below="@+id/changeNameFAB"
+            android:text="Danger Zone" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/clearDataFAB"
+            style="@style/centerStyle"
+            android:layout_below="@+id/dangerZoneTitle"
+            android:src="@drawable/delete" />
+    </RelativeLayout>
+</RelativeLayout>

@@ -15,6 +15,7 @@ public class IntentBuilder {
     public static final String TAG = IntentBuilder.class.getSimpleName();
 
     public static Intent NewPokemonActivityBuilder(Context c, int pokemonId) {
+
         Intent intent = new Intent(c, NewPokemonActivity.class);
         intent.putExtra("POKEMON_ID", pokemonId);
         Log.d(TAG, "NewPokemonActivityBuilder called with id = " + pokemonId);

@@ -1,10 +1,22 @@
 package pl.lukmarr.pokemontrainer.utils;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
+
+import com.trnql.smart.people.PeopleManager;
+
+import java.util.Random;
 
 import io.realm.Realm;
+import pl.lukmarr.pokemontrainer.R;
+import pl.lukmarr.pokemontrainer.config.Config;
 import pl.lukmarr.pokemontrainer.database.Achievement;
 import pl.lukmarr.pokemontrainer.database.RealmPosition;
+import pl.lukmarr.pokemontrainer.entities.activities.MainActivity;
 
 /**
  * Created by Łukasz Marczak
@@ -12,8 +24,62 @@ import pl.lukmarr.pokemontrainer.database.RealmPosition;
  * @since 29.12.15
  */
 public class FirstTimeSetup {
+    public static final String TAG = FirstTimeSetup.class.getSimpleName();
+
+    public static void handleNoInternetConnection(final MainActivity athis) {
+
+        if (Config.isNetworkAvailable(athis)) {
+            athis.fetchPokes();
+        } else {
+            new AlertDialog.Builder(athis)
+                    .setMessage("No Internet connection detected.")
+                    .setNegativeButton("Close App", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            athis.finish();
+                        }
+                    }).setPositiveButton("Enable", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    athis.startActivityForResult(new Intent(Settings.ACTION_WIFI_SETTINGS), 100);
+                    dialog.dismiss();
+                }
+            }).show();
+        }
+    }
+
+
     public static void setup(Context context) {
+        Log.d(TAG, "setup ");
         setupDataForTheFirstTime(context);
+    }
+
+    public static void setupSmarts(Context c) {
+        Log.d(TAG, "setupSmarts ");
+        try {
+            setupSmartPeopleForTheFirstTime(c);
+            modifySmartPeopleForTheFirstTime();
+        } catch (Exception x) {
+            Log.e(TAG, "setupSmarts " + x.getMessage());
+            x.printStackTrace();
+        }
+    }
+
+    public static void setupSmartPeopleForTheFirstTime(Context context) {
+        Log.d(TAG, "setupSmartPeopleForTheFirstTime ");
+        PeopleManager.INSTANCE.setProductName(context.getResources().getString(R.string.trnql_key));
+        PeopleManager.INSTANCE.setUserToken(context.getResources().getString(R.string.trnql_key));
+    }
+
+    public static void modifySmartPeopleForTheFirstTime() {
+        Log.d(TAG, "modifySmartPeopleForTheFirstTime ");
+        PeopleManager.INSTANCE.setSearchRadius(50000);
+        PeopleManager.INSTANCE.setDataPayload("RealmUser " + getRandy());
+    }
+
+    static int getRandy() {
+        return 1 + new Random().nextInt() % 9;
     }
 
     private static void setupDataForTheFirstTime(Context mContext) {

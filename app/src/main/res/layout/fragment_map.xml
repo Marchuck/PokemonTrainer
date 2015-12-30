@@ -5,16 +5,5 @@
     android:id="@+id/content"
     tools:context="pl.lukmarr.pokemontrainer.entities.fragments.MapFragment">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view"
-        android:background="@android:color/darker_gray"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-    <!--<RelativeLayout-->
-    <!--android:id="@+id/content"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"/>-->
-
-
 
 </RelativeLayout>

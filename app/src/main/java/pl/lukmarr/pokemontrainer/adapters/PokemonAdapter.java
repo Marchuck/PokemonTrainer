@@ -1,6 +1,7 @@
 package pl.lukmarr.pokemontrainer.adapters;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.ColorMatrixColorFilter;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -25,6 +26,7 @@ import pl.lukmarr.pokemontrainer.connection.DataFetcher;
 import pl.lukmarr.pokemontrainer.connection.UIAction;
 import pl.lukmarr.pokemontrainer.connection.UIError;
 import pl.lukmarr.pokemontrainer.database.RealmPoke;
+import pl.lukmarr.pokemontrainer.entities.activities.NewPokemonActivity;
 import pl.lukmarr.pokemontrainer.utils.interfaces.ListCallback;
 
 
@@ -33,18 +35,21 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.ItemView
     List<RealmPoke> mItems = new ArrayList<>();
     ColorMatrixColorFilter filter;
     Activity activity;
+    public static int lastScrolledPosition = 0;
 
     DataFetcher morePokesFetcher;
     View progressView, recyclerView;
 
     public PokemonAdapter(@NonNull List<RealmPoke> dataSet, @NonNull Activity context,
-                          @NonNull View progressView, @NonNull View recyclerView) {
+                          @NonNull View progressView, @NonNull RecyclerView recyclerView) {
         mItems.addAll(dataSet);
         this.activity = context;
         this.progressView = progressView;
         this.recyclerView = recyclerView;
         morePokesFetcher = new DataFetcher();
         setHasStableIds(false);
+        if (lastScrolledPosition <= getItemCount() && lastScrolledPosition >= 0)
+            recyclerView.scrollToPosition(lastScrolledPosition);
     }
 
     public void refresh(@NonNull List<RealmPoke> dataSet) {
@@ -70,23 +75,24 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.ItemView
 
     @Override
     public void onBindViewHolder(final ItemViewHolder holder, final int position) {
-        RealmPoke pokemon = mItems.get(position);
-
-        Log.d(TAG, "onBindViewHolder " + position + ", " + pokemon.getName());
-
+        final RealmPoke pokemon = mItems.get(position);
+        Log.d(TAG, "onBindViewHolder " + position + ", " + pokemon.getName()
+                + ", lastScroll = " + lastScrolledPosition);
 
         if (pokemon.isDiscovered()) {
             Picasso.with(activity).load(pokemon.getImage()).fit().into(holder.image);
             holder.name.setText(pokemon.getName());
+            holder.image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startDetailActivity(pokemon);
+                }
+            });
+            lastScrolledPosition = position;
         } else {
-//            PicassoGrayed gr = new PicassoGrayed(holder.image, 100, 100);
-//            Picasso.with(activity).load(pokemon.getImage()).resize(100, 100)
-//                    .into(gr);
             Picasso.with(activity).load(R.drawable.question_mark).fit().into(holder.image);
             holder.name.setText("Undiscovered");
         }
-
-
         //load more pokemons
         if (position == 150) {
             progressView.setVisibility(View.GONE);
@@ -94,6 +100,11 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.ItemView
         } else if (position < 151 && position == mItems.size() - 1) {
             fetchMorePokes(position);
         }
+    }
+
+    private void startDetailActivity(RealmPoke pokemon) {
+        Intent intent = NewPokemonActivity.buildIntent(pokemon, "", activity);
+        activity.startActivity(intent);
     }
 
     private void fetchMorePokes(int position) {

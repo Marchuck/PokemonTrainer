@@ -28,6 +28,7 @@ public class Config {
     public static int INCREMENT_POKES = 7;
     public static int currentFragmentId = -1;
     public static int transparentLayoutHeight = 200;
+    public static String currentUser = "RealmUser";
 
     public static void registerNewPokemon(LatLng poke, int id) {
         pokesNearby.add(new Pair<>(poke, id));

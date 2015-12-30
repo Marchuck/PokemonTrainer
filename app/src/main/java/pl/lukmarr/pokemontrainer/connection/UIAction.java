@@ -23,11 +23,12 @@ public class UIAction implements Action0 {
 
     @Override
     public void call() {
-        a.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                v.setVisibility(s ? View.VISIBLE : View.GONE);
-            }
-        });
+        if (v != null && v.isShown())
+            a.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    v.setVisibility(s ? View.VISIBLE : View.GONE);
+                }
+            });
     }
 }

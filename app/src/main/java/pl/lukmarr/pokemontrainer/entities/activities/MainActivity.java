@@ -3,7 +3,6 @@ package pl.lukmarr.pokemontrainer.entities.activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -14,6 +13,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.SupportMapFragment;
@@ -32,11 +32,11 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 import pl.lukmarr.pokemontrainer.R;
 import pl.lukmarr.pokemontrainer.adapters.DrawerAdapter;
 import pl.lukmarr.pokemontrainer.config.Config;
 import pl.lukmarr.pokemontrainer.connection.DataFetcher;
+import pl.lukmarr.pokemontrainer.connection.LocationSettings;
 import pl.lukmarr.pokemontrainer.connection.UIAction;
 import pl.lukmarr.pokemontrainer.connection.UIError;
 import pl.lukmarr.pokemontrainer.database.RealmPoke;
@@ -50,23 +50,28 @@ import pl.lukmarr.pokemontrainer.entities.fragments.TrainersFragment;
 import pl.lukmarr.pokemontrainer.entities.fragments.WaitFragment;
 import pl.lukmarr.pokemontrainer.utils.FirstTimeSetup;
 import pl.lukmarr.pokemontrainer.utils.LocationHelper;
-import pl.lukmarr.pokemontrainer.utils.interfaces.EnvironmentConnector;
+import pl.lukmarr.pokemontrainer.utils.general.RealmUtils;
+import pl.lukmarr.pokemontrainer.utils.interfaces.DrawerConnector;
 import pl.lukmarr.pokemontrainer.utils.interfaces.ListCallback;
-import pl.lukmarr.pokemontrainer.utils.interfaces.PersonConnector;
 import pl.lukmarr.pokemontrainer.utils.interfaces.PokemonRefreshable;
 
 public class MainActivity extends SmartCompatActivity {
     public static final String TAG = MainActivity.class.getSimpleName();
     public PokemonRefreshable pokemonRefreshable;
-    public EnvironmentConnector environmentConnector;
-    public PersonConnector personConnector;
+    public DrawerConnector drawerConnector;
     public DataFetcher dataFetcher;
     public SupportMapFragment rightMapFragment;
     public LatLng lastLatLng;
-
+    public WeatherEntry weather = null;
 
     @Bind(R.id.drawer_layout)
     DrawerLayout drawerLayout;
+
+    @Bind(R.id.greetTextView)
+    TextView greetTextView;
+
+    @Bind(R.id.howMuchPokes)
+    TextView discoveredPokesMessage;
 //
 //    @Bind(R.id.right_map_drawer_container)
 //    RelativeLayout rightDrawerContainer;
@@ -79,77 +84,31 @@ public class MainActivity extends SmartCompatActivity {
     public android.support.v7.widget.Toolbar toolbar;
 
     public ActionBarDrawerToggle toggle;
+    public List<PersonEntry> lastPeople = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setupRealm();
+        getAppData().startAllServices();
+        RealmUtils.setupRealm(this);
         ButterKnife.bind(this);
         getAppData().setApiKey("c9ad5f56-8d2b-4c01-9d30-ad6aa477e35c");
-        handleNoInternetConnection();
+        FirstTimeSetup.handleNoInternetConnection(this);
         initDrawer();
         switchTo(-1);
-//        getSupportFragmentManager().beginTransaction()
-//                .replace(R.id.content, PokedexFragment.newInstance()).commitAllowingStateLoss();
         FirstTimeSetup.setup(this);
-
-
+        LocationSettings.launch(this);
+        invalidateGreetMessage();
     }
 
-
-    private void setupRealm() {
-        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(this)
-                .deleteRealmIfMigrationNeeded()
-                .build();
-        Realm.setDefaultConfiguration(realmConfiguration);
-
-    }
-
-    void handleNoInternetConnection() {
-        if (Config.isNetworkAvailable(this)) {
-            fetchPokes();
-        } else {
-            new AlertDialog.Builder(this)
-                    .setTitle("NO Internet Connection")
-                    .setNegativeButton("Close App", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            finish();
-                        }
-                    }).setPositiveButton("Enable", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    startActivityForResult(new Intent(Settings.ACTION_WIFI_SETTINGS), 100);
-                    dialog.dismiss();
-                }
-            }).show();
-        }
-    }
-
-
-    void fetchPokes() {
-        Realm realm = Realm.getInstance(this);
-        final List<RealmPoke> pokes = realm.where(RealmPoke.class).findAll();
-        if (pokes == null || pokes.size() == 0) {
-
-            List<Integer> ids = new ArrayList<>();
-            for (int j = 1; j < 31; j++) {
-                ids.add(j);
-            }
-            dataFetcher = new DataFetcher();
-            dataFetcher.onError = new UIError(this);
-            dataFetcher.onSubscribe = new UIAction(this, progressView, true);
-            dataFetcher.onCompleted = new UIAction(this, progressView, false);
-            dataFetcher.fetchPokes(MainActivity.this, ids, new ListCallback<RealmPoke>() {
-                @Override
-                public void onListReceived(List<RealmPoke> list) {
-                    Log.i(TAG, "pokemons received!\n size = " + list.size());
-                    pokemonRefreshable.refreshPokes(pokes);
-                }
-            });
-        }
+    public void invalidateGreetMessage() {
+        String greetMessage =
+                String.format(getResources().getString(R.string.welcome_message), RealmUtils.getUserName(this));
+        String pokeStatus =
+                String.format(getResources().getString(R.string.pokes_discovered), RealmUtils.currentPokesCount(this));
+        greetTextView.setText(greetMessage);
+        discoveredPokesMessage.setText(pokeStatus);
     }
 
     private void initDrawer() {
@@ -204,9 +163,10 @@ public class MainActivity extends SmartCompatActivity {
     /**
      * @param j 0,1,2,3
      */
-    void switchTo(int j) {
+    public void switchTo(int j) {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content, getFragment(j))
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                 .commitAllowingStateLoss();
     }
 
@@ -227,13 +187,36 @@ public class MainActivity extends SmartCompatActivity {
                 return BadgesFragment.newInstance();
             case 3:
                 TrainersFragment fr = TrainersFragment.newInstance();
-                personConnector = fr;
+
                 return fr;
             case 4:
                 return DetailsFragment.newInstance();
             case 5:
             default:
                 return AboutFragment.newInstance();
+        }
+    }
+
+    public void fetchPokes() {
+        Realm realm = Realm.getInstance(this);
+        final List<RealmPoke> pokes = realm.where(RealmPoke.class).findAll();
+        if (pokes == null || pokes.size() == 0) {
+
+            List<Integer> ids = new ArrayList<>();
+            for (int j = 1; j < 31; j++) {
+                ids.add(j);
+            }
+            dataFetcher = new DataFetcher();
+            dataFetcher.onError = new UIError(this);
+            dataFetcher.onSubscribe = new UIAction(this, progressView, true);
+            dataFetcher.onCompleted = new UIAction(this, progressView, false);
+            dataFetcher.fetchPokes(MainActivity.this, ids, new ListCallback<RealmPoke>() {
+                @Override
+                public void onListReceived(List<RealmPoke> list) {
+                    Log.i(TAG, "pokemons received!\n size = " + list.size());
+                    pokemonRefreshable.refreshPokes(pokes);
+                }
+            });
         }
     }
 
@@ -256,7 +239,7 @@ public class MainActivity extends SmartCompatActivity {
     protected void smartPeopleChange(List<PersonEntry> people) {
         super.smartPeopleChange(people);
         Log.d(TAG, "smartPeopleChange");
-        if (personConnector != null) personConnector.onPersonReceived(people);
+        lastPeople = people;
     }
 
     @Override
@@ -273,9 +256,9 @@ public class MainActivity extends SmartCompatActivity {
         if (drawerLayout.isDrawerOpen(Gravity.LEFT)) {
             Log.d(TAG, "closing left drawer");
             drawerLayout.closeDrawer(Gravity.LEFT);
-        } else if (personConnector != null && personConnector.isDrawerOpened()) {
+        } else if (drawerConnector != null && drawerConnector.isDrawerOpened()) {
             Log.d(TAG, "closing right drawer");
-            personConnector.closeDrawer();
+            drawerConnector.closeDrawer();
         } else if (Config.currentFragmentId != -1) {
             Log.d(TAG, "switch to -1");
             switchTo(-1);
@@ -295,7 +278,7 @@ public class MainActivity extends SmartCompatActivity {
     protected void smartAddressChange(AddressEntry address) {
         super.smartAddressChange(address);
         Log.d(TAG, "smartAddressChange " + address);
-        if (environmentConnector != null) environmentConnector.onAddressChange(address);
+//        if (environmentConnector != null) environmentConnector.onAddressChange(address);
     }
 
     boolean wasFalse = true;
@@ -303,17 +286,16 @@ public class MainActivity extends SmartCompatActivity {
     @Override
     protected void smartLatLngChange(LocationEntry location) {
         super.smartLatLngChange(location);
+
+        Log.d(TAG, "smartLatLngChange " + location);
+        lastLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+        updatePosition(location.getLatitude(), location.getLongitude());
         if (wasFalse) {
             unlockDrawer();
             switchTo(0);
             wasFalse = false;
         }
-        Log.d(TAG, "smartLatLngChange " + location);
-        lastLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-        updatePosition(location.getLatitude(), location.getLongitude());
-
         fetchPokesSilently();
-
     }
 
     private void fetchPokesSilently() {
@@ -363,13 +345,15 @@ public class MainActivity extends SmartCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume ");
+        invalidateGreetMessage();
     }
 
     @Override
     protected void smartWeatherChange(WeatherEntry weather) {
         super.smartWeatherChange(weather);
         Log.d(TAG, "smartWeatherChange " + weather);
-        if (environmentConnector != null) environmentConnector.onWeatherChange(weather);
+//        if (environmentConnector != null) environmentConnector.onWeatherChange(weather);
+        this.weather = weather;
     }
 
     @Override
@@ -388,4 +372,7 @@ public class MainActivity extends SmartCompatActivity {
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 
+    public void refreshLeftDrawer() {
+        invalidateGreetMessage();
+    }
 }

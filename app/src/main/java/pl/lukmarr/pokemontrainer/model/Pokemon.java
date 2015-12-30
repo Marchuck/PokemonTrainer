@@ -8,14 +8,14 @@ import java.util.List;
  */
 public class Pokemon {
 
-    public List<Ability> abilities = new ArrayList<Ability>();
+    public List<PokeDetail> abilities = new ArrayList<PokeDetail>();
     public Integer attack;
     public Integer catch_rate;
     public String created;
     public Integer defense;
-    public List<Description> descriptions = new ArrayList<Description>();
+    public List<PokeDetail> descriptions = new ArrayList<PokeDetail>();
     public Integer egg_cycles;
-    public List<EggGroup> egg_groups = new ArrayList<EggGroup>();
+    public List<PokeDetail> egg_groups = new ArrayList<PokeDetail>();
     public String ev_yield;
     public List<Evolution> evolutions = new ArrayList<Evolution>();
     public Integer exp;
@@ -34,8 +34,8 @@ public class Pokemon {
     public Integer sp_def;
     public String species;
     public Integer speed;
-    public List<Sprite> sprites = new ArrayList<Sprite>();
+    public List<PokeDetail> sprites = new ArrayList<PokeDetail>();
     public Integer total;
-    public List<Type> types = new ArrayList<Type>();
+    public List<PokeDetail> types = new ArrayList<PokeDetail>();
     public String weight;
 }

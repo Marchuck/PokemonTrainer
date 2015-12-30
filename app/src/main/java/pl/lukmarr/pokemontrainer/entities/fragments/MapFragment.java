@@ -3,9 +3,6 @@ package pl.lukmarr.pokemontrainer.entities.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,24 +16,19 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.realm.Realm;
 import pl.lukmarr.pokemontrainer.R;
-import pl.lukmarr.pokemontrainer.adapters.MessageAdapter;
 import pl.lukmarr.pokemontrainer.database.RealmPoke;
 import pl.lukmarr.pokemontrainer.database.RealmPosition;
-import pl.lukmarr.pokemontrainer.entities.activities.MainActivity;
 import pl.lukmarr.pokemontrainer.utils.MapUtils;
 import pl.lukmarr.pokemontrainer.utils.interfaces.PokemonRefreshable;
 
 public class MapFragment extends Fragment implements PokemonRefreshable {
-    LatLng lastLatLng;
-    MapUtils mapUtils;
+  public   LatLng lastLatLng;
+    public  MapUtils mapUtils;
     boolean refreshed = false;
 
-    @Bind(R.id.recycler_view)
-    RecyclerView recyclerView;
     @Bind(R.id.content)
     RelativeLayout content;
 
-    MessageAdapter messageAdapter;
 
     public static MapFragment newInstance() {
         MapFragment fragment = new MapFragment();
@@ -78,15 +70,6 @@ public class MapFragment extends Fragment implements PokemonRefreshable {
     }
     View view;
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        messageAdapter = new MessageAdapter(getActivity(), content);
-        ((MainActivity) getActivity()).environmentConnector = messageAdapter;
-
-        recyclerView.setAdapter(messageAdapter);
-        Log.d("", "onViewCreated ");
-    }
 
     public void refreshMap(LatLng latLng) {
         if (!refreshed) {

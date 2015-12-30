@@ -27,7 +27,7 @@ import pl.lukmarr.pokemontrainer.utils.RandUtils;
  * @since 27.12.15
  */
 public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.VH> {
-
+    private static int lastPosition = -1;
     private final Listener listener;
     List<Pair<String, Integer>> items = new ArrayList<>();
     Context context;
@@ -60,12 +60,20 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.VH> {
 
     @Override
     public void onBindViewHolder(VH holder, final int position) {
+        if (position == lastPosition) {
+            holder.text.setTextColor(context.getResources().getColor(android.R.color.black));
+        } else {
+            holder.text.setTextColor(context.getResources().getColor(android.R.color.white));
+        }
+
         holder.text.setText(items.get(position).first);
         Picasso.with(context).load(items.get(position).second).into(holder.icon);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 listener.onClicked(position);
+                lastPosition = position;
+                notifyDataSetChanged();
             }
         });
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -74,7 +82,8 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.VH> {
                 if (position == 3) {
                     Log.d("", "onLongClick ");
                     context.startActivity(IntentBuilder
-                            .NewPokemonActivityBuilder(context, RandUtils.create().randomPokeButUnique(context)));
+                            .NewPokemonActivityBuilder(context,
+                                    RandUtils.create().randomPokeButUnique(context)));
                 }
                 return false;
             }

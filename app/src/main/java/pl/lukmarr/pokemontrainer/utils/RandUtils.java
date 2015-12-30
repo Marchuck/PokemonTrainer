@@ -1,6 +1,7 @@
 package pl.lukmarr.pokemontrainer.utils;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -82,5 +83,12 @@ public class RandUtils {
         int randomIndex = random.nextInt(indexes.size());
         realm.close();
         return indexes.get(randomIndex);
+    }
+
+    public static <T> T randListObject(@NonNull List<T> list) {
+        int listSize = list.size();
+        if (listSize == 0) return list.get(0);
+        int index = new Random().nextInt(list.size());
+        return list.get(index);
     }
 }

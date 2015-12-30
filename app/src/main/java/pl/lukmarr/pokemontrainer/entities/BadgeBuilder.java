@@ -2,6 +2,8 @@ package pl.lukmarr.pokemontrainer.entities;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -28,10 +30,12 @@ public class BadgeBuilder {
 
     private static void rawBuild(Activity context, String message) {
         final Dialog dialog = new Dialog(context);
-
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        //this makes cardView look
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setContentView(R.layout.badge_dialog);
         TextView su = (TextView) dialog.findViewById(R.id.subtitle);
-        RelativeLayout ok = (RelativeLayout) dialog.findViewById(R.id.OK);
+        RelativeLayout ok = (RelativeLayout) dialog.findViewById(R.id.parent);
         su.setText(message);
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
