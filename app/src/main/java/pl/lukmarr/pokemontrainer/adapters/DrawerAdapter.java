@@ -42,13 +42,13 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.VH> {
 
     private DrawerAdapter(Context c, Listener listener) {
         context = c;
-        items.add(new Pair<>("Map", android.R.drawable.alert_light_frame));
-        items.add(new Pair<>("Pokedex", android.R.drawable.alert_light_frame));
-        items.add(new Pair<>("Badges", android.R.drawable.alert_light_frame));
-        items.add(new Pair<>("Trainers nearby", android.R.drawable.alert_light_frame));
-        items.add(new Pair<>("Details", android.R.drawable.alert_light_frame));
-        items.add(new Pair<>("About", android.R.drawable.alert_light_frame));
-        items.add(new Pair<>("Exit", android.R.drawable.alert_light_frame));
+        items.add(new Pair<>("Map", R.drawable.map));
+        items.add(new Pair<>("Pokedex", R.drawable.cat));
+        items.add(new Pair<>("Badges", R.drawable.star_icon));
+        items.add(new Pair<>("Trainers nearby", R.drawable.walk));
+        items.add(new Pair<>("Details", R.drawable.dots_horizontal));
+        items.add(new Pair<>("About", R.drawable.message_text));
+        items.add(new Pair<>("Exit", R.drawable.exit_to_app));
         this.listener = listener;
     }
 

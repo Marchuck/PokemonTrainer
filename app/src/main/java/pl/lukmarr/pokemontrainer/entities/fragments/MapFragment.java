@@ -22,11 +22,11 @@ import pl.lukmarr.pokemontrainer.utils.MapUtils;
 import pl.lukmarr.pokemontrainer.utils.interfaces.PokemonRefreshable;
 
 public class MapFragment extends Fragment implements PokemonRefreshable {
-  public   LatLng lastLatLng;
-    public  MapUtils mapUtils;
+    public LatLng lastLatLng;
+    public MapUtils mapUtils;
     boolean refreshed = false;
 
-    @Bind(R.id.content)
+    @Bind(R.id.content_map)
     RelativeLayout content;
 
 
@@ -48,7 +48,7 @@ public class MapFragment extends Fragment implements PokemonRefreshable {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_map, container, false);
-        this.view=v;
+        this.view = v;
         ButterKnife.bind(this, v);
 
 
@@ -68,19 +68,20 @@ public class MapFragment extends Fragment implements PokemonRefreshable {
 
         return v;
     }
+
     View view;
 
 
     public void refreshMap(LatLng latLng) {
         if (!refreshed) {
-            mapUtils.setupMap(R.id.content, latLng );
+            mapUtils.setupMap(R.id.content_map, latLng, content);
             refreshed = true;
         }
     }
 
     @Override
     public void refreshPokes(List<RealmPoke> pokes) {
-        mapUtils.setupMap(R.id.content, lastLatLng );
+        mapUtils.setupMap(R.id.content, lastLatLng, content);
 
     }
 }
