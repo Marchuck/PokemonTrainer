@@ -16,10 +16,31 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    signingConfigs {
+        release {
+            storeFile file("myreleasekey.keystore")
+            storePassword "+XCSwTPqa*yxFXZa=6D"
+            keyAlias "dd3#JK+STnUR&KKq%kxv"
+            keyPassword "RH9uaH9-+JDZb98csU^U"
+        }
+
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'),
+                    'proguard-rules.pro'
+
+            signingConfig signingConfigs.release
+        }
+
+    }
+    productFlavors {
+        flavor1 {
+        }
+        flavor2 {
+            proguardFile 'other-rules.pro'
         }
     }
 }
@@ -36,7 +57,7 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'io.reactivex:rxandroid:0.25.0'
     //cool animation
-    compile 'com.yalantis:starwarstiles:0.1.0'
+//    compile 'com.yalantis:starwarstiles:0.1.0'
     //images caching
     compile 'com.squareup.picasso:picasso:2.5.2'
     //database
