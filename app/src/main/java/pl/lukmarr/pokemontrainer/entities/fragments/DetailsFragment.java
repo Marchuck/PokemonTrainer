@@ -44,10 +44,12 @@ public class DetailsFragment extends Fragment {
 
     @OnClick(R.id.weatherFAB)
     public void seeWeather() {
+        String weatherMessage = "Weather unavailable";
         WeatherEntry weatherEntry = fromMain().weather;
-        if (weatherEntry != null)
-            new WeatherDisplayer(getActivity(), weatherEntry);
-        else safeMessage("Weather info unavailable now");
+        if(weatherEntry!=null)
+            weatherMessage = weatherEntry.getWeatherSummaryAsString();
+
+            new WeatherDisplayer(getActivity(), weatherMessage);
     }
 
     @Bind(R.id.clearDataFAB)
@@ -144,7 +146,7 @@ public class DetailsFragment extends Fragment {
         ButterKnife.bind(this, v);
         FABUtils.setupFAB(getActivity(), fabDel, R.drawable.delete);
         FABUtils.setupFAB(getActivity(), fabChange, R.drawable.pencil);
-        FABUtils.setupFAB(getActivity(), fabWeather, R.drawable.weather_sunny);
+        FABUtils.setupFAB(getActivity(), fabWeather, WeatherDisplayer.getRandRes());
         FirstTimeSetup.setupSmarts(getActivity());
         return v;
     }
