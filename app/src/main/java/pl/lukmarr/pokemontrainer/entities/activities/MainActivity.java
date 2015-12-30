@@ -138,7 +138,8 @@ public class MainActivity extends SmartCompatActivity {
             @Override
             public void onClicked(int j) {
                 if (j == 6) {
-                    new AlertDialog.Builder(MainActivity.this).setTitle("Are you sure to quit?")
+                    new AlertDialog.Builder(MainActivity.this)
+ //                           .setTitle("Are you sure to quit?")
                             .setMessage("Are you sure to quit?")
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
