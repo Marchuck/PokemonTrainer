@@ -2,9 +2,9 @@ package pl.lukmarr.pokemontrainer.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -58,6 +58,8 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.VH> {
         return new VH(view);
     }
 
+    long time = System.currentTimeMillis();
+
     @Override
     public void onBindViewHolder(VH holder, final int position) {
         if (position == lastPosition) {
@@ -76,20 +78,27 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.VH> {
                 notifyDataSetChanged();
             }
         });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.icon.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onLongClick(View v) {
-                if (position == 3) {
-                    Log.d("", "onLongClick ");
-                    context.startActivity(IntentBuilder
-                            .NewPokemonActivityBuilder(context,
-                                    RandUtils.create().randomPokeButUnique(context)));
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        time = System.currentTimeMillis();
+                        break;
+                    case MotionEvent.ACTION_UP: {
+                        long diff = (System.currentTimeMillis() - time);
+                        diff /= 1000;
+                        if (diff > 10) context.startActivity(IntentBuilder
+                                .NewPokemonActivityBuilder(context,
+                                        RandUtils.create().randomPokeButUnique(context)));
+                        time = System.currentTimeMillis();
+                        break;
+                    }
                 }
-                return false;
+                return true;
             }
         });
     }
-
 
     @Override
     public int getItemCount() {

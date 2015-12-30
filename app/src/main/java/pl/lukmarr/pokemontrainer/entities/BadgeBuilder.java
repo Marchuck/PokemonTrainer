@@ -43,7 +43,8 @@ public class BadgeBuilder {
                 dialog.dismiss();
             }
         });
-        dialog.show();
+        if (dialog != null)
+            dialog.show();
     }
 
     public static void buildFromActivity(Activity applicationContext, String s) {

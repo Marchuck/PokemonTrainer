@@ -97,18 +97,22 @@ public class TrainersFragment extends Fragment implements DrawerConnector {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        trainersAdapter.refresh(fromMain().lastPeople);
                         swipeLayout.setRefreshing(false);
-                        if (trainersAdapter.dataSet == null || trainersAdapter.dataSet.size() == 0)
-                            DetailsFragment.safeMessage(TrainersFragment.this, "No trainers nearby!");
+                        onRefreshed();
                     }
                 }, 500);
             }
         });
         swipeLayout.setColorSchemeResources(R.color.accent_color,
                 R.color.accent_color_darker, R.color.accent_color);
-
+        onRefreshed();
         return v;
+    }
+
+    void onRefreshed() {
+        trainersAdapter.refresh(fromMain().lastPeople);
+        if (trainersAdapter.dataSet == null || trainersAdapter.dataSet.size() == 0)
+            DetailsFragment.safeMessage(TrainersFragment.this, "No trainers nearby!");
     }
 
     public void openMapDrawer(final @Nullable List<PersonEntry> entries, final View view) {
@@ -162,7 +166,7 @@ public class TrainersFragment extends Fragment implements DrawerConnector {
                 else positionMean = fromMain().lastLatLng;
                 if (positionMean == null) return;
                 googleMap.animateCamera(CameraUpdateFactory
-                        .newCameraPosition(new CameraPosition(positionMean, 16, 60, 0)));
+                        .newCameraPosition(new CameraPosition(positionMean, 13, 60, 0)));
             }
         });
     }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Log;
 
 import java.util.List;
+import java.util.Random;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -46,9 +47,13 @@ public class RealmUtils {
     public static String getUserName(Context context) {
         Realm realm = Realm.getInstance(context);
         RealmUser user = realm.where(RealmUser.class).findFirst();
-        String userName = user == null ? "User" : user.getName();
+        String userName = user == null ? ("User " + getRandy()) : user.getName();
         realm.close();
         return userName;
+    }
+
+    static int getRandy() {
+        return 1 + new Random().nextInt() % 9;
     }
 
     public static void updateUser(final String newName, Context context) {

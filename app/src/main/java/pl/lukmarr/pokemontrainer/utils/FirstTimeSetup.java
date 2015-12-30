@@ -17,6 +17,7 @@ import pl.lukmarr.pokemontrainer.config.Config;
 import pl.lukmarr.pokemontrainer.database.Achievement;
 import pl.lukmarr.pokemontrainer.database.RealmPosition;
 import pl.lukmarr.pokemontrainer.entities.activities.MainActivity;
+import pl.lukmarr.pokemontrainer.utils.general.RealmUtils;
 
 /**
  * Created by Łukasz Marczak
@@ -59,7 +60,7 @@ public class FirstTimeSetup {
         Log.d(TAG, "setupSmarts ");
         try {
             setupSmartPeopleForTheFirstTime(c);
-            modifySmartPeopleForTheFirstTime();
+            modifySmartPeopleForTheFirstTime(c);
         } catch (Exception x) {
             Log.e(TAG, "setupSmarts " + x.getMessage());
             x.printStackTrace();
@@ -69,18 +70,20 @@ public class FirstTimeSetup {
     public static void setupSmartPeopleForTheFirstTime(Context context) {
         Log.d(TAG, "setupSmartPeopleForTheFirstTime ");
         PeopleManager.INSTANCE.setProductName(context.getResources().getString(R.string.trnql_key));
-        PeopleManager.INSTANCE.setUserToken(context.getResources().getString(R.string.trnql_key));
+        PeopleManager.INSTANCE.setUserToken(getDeviceId(context));
     }
 
-    public static void modifySmartPeopleForTheFirstTime() {
+    private static String getDeviceId(Context context) {
+        return android.provider.Settings.Secure.getString(context.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+    }
+
+    public static void modifySmartPeopleForTheFirstTime(Context co) {
         Log.d(TAG, "modifySmartPeopleForTheFirstTime ");
         PeopleManager.INSTANCE.setSearchRadius(50000);
-        PeopleManager.INSTANCE.setDataPayload("RealmUser " + getRandy());
+        PeopleManager.INSTANCE.setDataPayload(RealmUtils.getUserName(co));
     }
 
-    static int getRandy() {
-        return 1 + new Random().nextInt() % 9;
-    }
 
     private static void setupDataForTheFirstTime(Context mContext) {
         Realm realm = Realm.getInstance(mContext);
