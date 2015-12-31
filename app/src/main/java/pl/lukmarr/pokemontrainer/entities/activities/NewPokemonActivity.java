@@ -44,7 +44,6 @@ public class NewPokemonActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_pokemon);
         ButterKnife.bind(this);
-
         Intent i = getIntent();
         int pokemonId = i.getIntExtra("POKEMON_ID", -1);
         String message = i.getStringExtra("TITLE");

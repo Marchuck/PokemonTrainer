@@ -1,20 +1,16 @@
 package pl.lukmarr.pokemontrainer.utils;
 
-import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.location.GpsStatus;
-import android.location.LocationManager;
+import android.location.Location;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.Calendar;
-import java.util.Date;
-
+import io.realm.Realm;
+import io.realm.RealmResults;
 import pl.lukmarr.pokemontrainer.config.Config;
+import pl.lukmarr.pokemontrainer.database.OutdoorPoke;
+import pl.lukmarr.pokemontrainer.database.RealmPoke;
 
 
 /**
@@ -24,58 +20,52 @@ import pl.lukmarr.pokemontrainer.config.Config;
  */
 public final class LocationHelper {
 
-//    private static List<BroadcastReceiver> receivers = new ArrayList<>();
-    private static LocationHelper INSTANCE;
     public static final String TAG = LocationHelper.class.getSimpleName();
-    Activity activity;
-    private LocationManager locationManager;
-    private GpsStatus.Listener gpsStatusListener;
-    //    private Toast toast;
 
+    public static float distanceBetweenLatLngs(LatLng latLng1, LatLng latLng2) {
+        Location loc1 = new Location("");
+        loc1.setLatitude(latLng1.latitude);
+        loc1.setLongitude(latLng1.longitude);
 
-    public static LocationHelper getInstance(Activity activity) {
-        if (INSTANCE == null)
-            INSTANCE = new LocationHelper(activity);
-        return INSTANCE;
+        Location loc2 = new Location("");
+        loc2.setLatitude(latLng2.latitude);
+        loc2.setLongitude(latLng2.longitude);
+
+        return loc1.distanceTo(loc2);
     }
 
-    private LocationHelper(Activity activity) {
-        this.activity = activity;
-        locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-    }
-
-    public void registerNewPokemonWatcher(LatLng latLng, int pokemonId) {
-        Intent intent = new Intent(PROX_ALERT_INTENT);
-        PendingIntent proximityIntent = PendingIntent.getBroadcast(activity, 0, intent, 0);
-        try {
-            double lat = latLng.latitude;
-            double lon = latLng.longitude;
-
-            locationManager.addProximityAlert(lat, lon, Config.RADIUS_IN_METERS,
-                    -1, proximityIntent);
-            IntentFilter filter = new IntentFilter(PROX_ALERT_INTENT + pokemonId);
-            ProximityIntentReceiver receiver = new ProximityIntentReceiver(pokemonId);
-//            receivers.add(receiver);
-            activity.registerReceiver(receiver, filter);
-        } catch (Exception c) {
-            Log.e(TAG, "LocationHelper " + c.getMessage());
-            c.printStackTrace();
+    public static void checkPokesNearby(final Context context, LatLng lastLatLng) {
+        Realm realm = Realm.getInstance(context);
+        RealmResults<OutdoorPoke> outdoorPokes = realm.where(OutdoorPoke.class)
+                .equalTo("poke.isDiscovered", false).findAll();
+        int pokemonId = -1;
+        float meters = 10000;
+        for (int j = 0; j < outdoorPokes.size(); j++) {
+            OutdoorPoke outdoorPoke = outdoorPokes.get(j);
+            LatLng position = new LatLng(outdoorPoke.getLat(), outdoorPoke.getLon());
+            float distance = distanceBetweenLatLngs(lastLatLng, position);
+            meters = distance < meters ? distance : meters;
+            if (distance < Config.RADIUS_IN_METERS) {
+                pokemonId = outdoorPoke.getPoke().getId();
+                realm.beginTransaction();
+                RealmPoke realmPoke = outdoorPoke.getPoke();
+                realmPoke.setIsDiscovered(true);
+                outdoorPoke.setPoke(realmPoke);
+                realm.commitTransaction();
+                realm.close();
+                break;
+            }
         }
-
-    }
-
-    public static void onDestroy(Activity activity) {
-        if (activity == null) {
-            Log.e(TAG, "onDestroy : activity is null!!!");
-            return;
+        if (pokemonId == -1) {
+            Log.d(TAG, "no pokes nearby. Closest pokemon is " + meters + " far");
+        } else {
+            final int pokemonIdAsFinal = pokemonId;
+            new android.os.Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    IntentBuilder.NewPokemonActivityBuilder(context, pokemonIdAsFinal);
+                }
+            }, 300);
         }
     }
-
-    public static long getExpirationTime() {
-        Date date = Calendar.getInstance().getTime();
-        date.setYear(2050);
-        return date.getTime();
-    }
-
-    public static final String PROX_ALERT_INTENT = "XDXDXD";
 }

@@ -58,8 +58,10 @@ public class DataFetcher {
                 .subscribe(receivedListAction1(a, listener), new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        Log.e(TAG, throwable.getMessage());
-                        throwable.printStackTrace();
+//                        if (throwable != null) {
+//                            Log.e(TAG, throwable.getMessage());
+//                            throwable.printStackTrace();
+//                        }
                         fetchingInProgress = false;
                     }
                 });

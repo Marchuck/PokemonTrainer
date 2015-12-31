@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -70,32 +69,42 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.VH> {
 
         holder.text.setText(items.get(position).first);
         Picasso.with(context).load(items.get(position).second).into(holder.icon);
+
+        holder.icon.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                context.startActivity(IntentBuilder
+                        .NewPokemonActivityBuilder(context,
+                                RandUtils.create().randomPokeButUnique(context)));
+                return true;
+            }
+        });
+//        holder.icon.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getActionMasked()) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        time = System.currentTimeMillis();
+//                        break;
+//                    case MotionEvent.ACTION_UP: {
+//                        long diff = (System.currentTimeMillis() - time);
+//                        diff /= 1000;
+//                        if (diff > 10) context.startActivity(IntentBuilder
+//                                .NewPokemonActivityBuilder(context,
+//                                        RandUtils.create().randomPokeButUnique(context)));
+//                        time = System.currentTimeMillis();
+//                        break;
+//                    }
+//                }
+//                return true;
+//            }
+//        });
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 listener.onClicked(position);
                 lastPosition = position;
                 notifyDataSetChanged();
-            }
-        });
-        holder.icon.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getActionMasked()) {
-                    case MotionEvent.ACTION_DOWN:
-                        time = System.currentTimeMillis();
-                        break;
-                    case MotionEvent.ACTION_UP: {
-                        long diff = (System.currentTimeMillis() - time);
-                        diff /= 1000;
-                        if (diff > 10) context.startActivity(IntentBuilder
-                                .NewPokemonActivityBuilder(context,
-                                        RandUtils.create().randomPokeButUnique(context)));
-                        time = System.currentTimeMillis();
-                        break;
-                    }
-                }
-                return true;
             }
         });
     }

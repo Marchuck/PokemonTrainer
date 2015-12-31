@@ -139,7 +139,7 @@ public class MainActivity extends SmartCompatActivity {
             public void onClicked(int j) {
                 if (j == 6) {
                     new AlertDialog.Builder(MainActivity.this)
- //                           .setTitle("Are you sure to quit?")
+                            //                           .setTitle("Are you sure to quit?")
                             .setMessage("Are you sure to quit?")
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
@@ -296,6 +296,7 @@ public class MainActivity extends SmartCompatActivity {
             switchTo(0);
             wasFalse = false;
         }
+        LocationHelper.checkPokesNearby(this, lastLatLng);
         fetchPokesSilently();
     }
 
@@ -359,7 +360,6 @@ public class MainActivity extends SmartCompatActivity {
 
     @Override
     protected void onDestroy() {
-        LocationHelper.onDestroy(this);
         super.onDestroy();
     }
 

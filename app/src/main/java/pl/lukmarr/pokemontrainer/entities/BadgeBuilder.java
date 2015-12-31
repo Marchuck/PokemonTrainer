@@ -29,6 +29,7 @@ public class BadgeBuilder {
     }
 
     private static void rawBuild(Activity context, String message) {
+        if(context.isDestroyed()) return;
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
         //this makes cardView look

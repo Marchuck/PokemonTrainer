@@ -16,33 +16,27 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
     signingConfigs {
         release {
             storeFile file("myreleasekey.keystore")
-            storePassword "+XCSwTPqa*yxFXZa=6D"
-            keyAlias "dd3#JK+STnUR&KKq%kxv"
-            keyPassword "RH9uaH9-+JDZb98csU^U"
+            storePassword "mariuszebiznesu"
+            keyAlias "LukaszMarczak"
+            keyPassword "nieprawd@niep0wiem"
         }
-
     }
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro'
 
             signingConfig signingConfigs.release
         }
+    }
 
-    }
-    productFlavors {
-        flavor1 {
-        }
-        flavor2 {
-            proguardFile 'other-rules.pro'
-        }
-    }
+
 }
 
 dependencies {

@@ -19,7 +19,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -49,6 +52,7 @@ public class MapUtils {
     }
 
     public void setupMap(final int mapViewHolder, final LatLng position, final RelativeLayout relativeLayout) {
+        Log.d(TAG, "setupMap ");
         this.relativeLayout = relativeLayout;
         this.lastPosition = position;
         if (mapFragment == null) {
@@ -57,33 +61,8 @@ public class MapUtils {
 
         activity.getSupportFragmentManager().beginTransaction().replace(mapViewHolder, mapFragment)
                 .commitAllowingStateLoss();
+        setupOutdoorPokes(position );
 
-        final List<RealmPoke> realmPokes1 = Realm.getInstance(activity).where(RealmPoke.class)
-                .equalTo("isDiscovered", false).findAll();
-        int count = realmPokes1.size() > 25 ? 25 : realmPokes1.size();
-        List<RealmPoke> realmPokes = new ArrayList<>();
-        for (int j = 0; j < count; j++) realmPokes.add(realmPokes1.get(j));
-
-        final List<LatLng> pokesNearby = RandUtils.create().getPokesNearby(position, count);
-
-        Realm realm0 = Realm.getInstance(activity);
-        RealmResults<OutdoorPoke> outdoorPokes = realm0.where(OutdoorPoke.class).findAll();
-        if (outdoorPokes == null || outdoorPokes.size() == 0) {
-            realm0.beginTransaction();
-            for (int k = 0; k < pokesNearby.size(); k++) {
-                RealmPoke poke = realmPokes.get(k);
-                LatLng pos = pokesNearby.get(k);
-                OutdoorPoke pok3 = new OutdoorPoke();
-                pok3.setLat(pos.latitude);
-                pok3.setLon(pos.longitude);
-                pok3.setPoke(poke);
-                pok3.setName(poke.getName());
-                realm0.copyToRealmOrUpdate(pok3);
-            }
-            realm0.commitTransaction();
-        } else {
-
-        }
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
@@ -116,6 +95,57 @@ public class MapUtils {
                 addFAB();
             }
         });
+    }
+
+    private void setupOutdoorPokes(LatLng position ) {
+        List<RealmPoke> realmPokes1 = Realm.getInstance(activity)
+                .where(RealmPoke.class).equalTo("isDiscovered", false).findAll();
+
+        int count = realmPokes1.size();
+        List<RealmPoke> realmPokes = new ArrayList<>();
+
+        int realLimit = count < 25 ? count : 25;
+
+        List<Integer> indexes = getRandIndexes(count, realLimit);
+        for (int j = 0; j < indexes.size(); j++)
+            realmPokes.add(realmPokes1.get(indexes.get(j)));
+
+        final List<LatLng> pokesNearby = RandUtils.create().getPokesNearby(position, realLimit   );
+
+        Realm realm0 = Realm.getInstance(activity);
+        RealmResults<OutdoorPoke> outdoorPokes = realm0.where(OutdoorPoke.class).findAll();
+        if (outdoorPokes == null || outdoorPokes.size() == 0) {
+            realm0.beginTransaction();
+            for (int k = 0; k < pokesNearby.size(); k++) {
+                RealmPoke poke = realmPokes.get(k);
+                LatLng pos = pokesNearby.get(k);
+                OutdoorPoke pok3 = new OutdoorPoke();
+                pok3.setLat(pos.latitude);
+                pok3.setLon(pos.longitude);
+                pok3.setPoke(poke);
+                pok3.setName(poke.getName());
+                realm0.copyToRealmOrUpdate(pok3);
+            }
+            realm0.commitTransaction();
+        } else {
+            Log.d(TAG, "outdoorPokes are up to date");
+        }
+    }
+
+    private List<Integer> getRandIndexes(int max, int limit) {
+        Log.d(TAG, "getRandIndexes for params: max = " + max + ", limit = " + limit);
+        List<Integer> list = new ArrayList<>();
+        Set<Integer> set = new HashSet<>();
+        Random r = new Random();
+        while (set.size() < limit) {
+            set.add(r.nextInt(max));
+        }
+
+        list.addAll(set);
+        for (Integer e : list) {
+            Log.d(TAG, "getRandIndexes " + e);
+        }
+        return list;
     }
 
     private void addFAB() {
@@ -156,13 +186,6 @@ public class MapUtils {
             @Override
             public void run() {
                 setupGoogleMap(googleMap, position, pks);
-                LocationHelper helper = LocationHelper.getInstance(activity);
-                for (int j = 0; j < pks.size(); j++) {
-                    OutdoorPoke op = pks.get(j);
-                    helper.registerNewPokemonWatcher(new LatLng(op.getLat(), op.getLon()),
-                            op.getPoke().getId());
-                }
-                Log.d("", "registering pokes done");
             }
         }, 1000);
     }
@@ -175,10 +198,6 @@ public class MapUtils {
         Picasso.with(activity).load(PokeSpritesManager
                 .getPokemonIconByNameAndId(pokemon.getId(), pokemon.getName()))
                 .into(marker);
-
-        if (Config.wasEmpty)
-            Config.registerNewPokemon(pokemonPosition, pokemon.getId());
-
     }
 
     public static LatLng asGoogleLatLng(com.javadocmd.simplelatlng.LatLng latLng) {

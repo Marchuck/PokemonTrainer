@@ -19,7 +19,7 @@
 -dontwarn io.realm.**
 
 # javax
--dontwarn javax.**
+#-dontwarn javax.**
 -dontwarn android.support.design.widget.**
 
 # retrofit
@@ -29,7 +29,7 @@
 -keepattributes Exceptions
 
 # okhttp
--dontwarn okio.**
+#-dontwarn okio.**
 
 # android.design.library
 -keep class android.support.v7.widget.** { *; }
@@ -39,60 +39,10 @@
 -keep interface android.support.design.widget.** { *; }
 -dontwarn android.support.design.**
 
-## google plus login gms
--keep class com.google.android.gms.common.** { *; }
-
--dontoptimize
--dontobfuscate
--keep class com.squareup.okhttp.** { *; }
-
--dontoptimize
--dontobfuscate
--keep class com.squareup.picasso.OkHttpDownloader.** { *; }
-
--dontoptimize
--dontobfuscate
--keep interface com.squareup.picasso.OkHttpDownloader.** { *; }
-
-
--dontoptimize
--dontobfuscate
+-dontwarn com.squareup.okhttp.**
 -dontwarn com.squareup.picasso.OkHttpDownloader.**
-
--dontoptimize
--dontobfuscate
--dontwarn com.trnql.zen.utlis.LocationUtils.**
-
--dontoptimize
--dontobfuscate
--keep class com.trnql.zen.utlis.LocationUtils.** { *; }
-
--dontoptimize
--dontobfuscate
--keep class com.trnql.zen.utlis.SoftHashMap.** { *; }
-
--dontwarn rx.internal.util.unsafe.**
-
-
--dontoptimize
--dontobfuscate
--keep interface com.google.android.gms.common.** { *; }
-
--dontoptimize
--dontobfuscate
--dontwarn com.google.android.gms.common.**
-
-
--dontoptimize
--dontobfuscate
--keep class com.google.android.gms.maps.** { *; }
-
--dontoptimize
--dontobfuscate
--keep interface com.google.android.gms.maps.** { *; }
-#-keep class com.google.android.gms.plus.** { *; }
-#-keep interface com.google.android.gms.plus.** { *; }
-#-dontwarn com.google.android.gms.plus.**
+#-keep class com.squareup.okhttp.** { *; }
+#-keep class com.squareup.picasso.OkHttpDownloader.** { *; }
 
 # app module
 -dontwarn pl.lukmarr.pokemontrainer.**
@@ -116,7 +66,17 @@
     public static int d(...);
     public static int e(...);
 }
+-dontwarn com.trnql.zen.utlis.LocationUtils.**
+
+-keep class com.trnql.zen.utlis.LocationUtils.** { *; }
+-keep class com.trnql.zen.utlis.SoftHashMap.** { *; }
+-keep interface com.trnql.zen.utlis.SoftHashMap.** { *; }
+-keep class com.trnql.zen.utlis.b.** { *; }
+-keep interface com.trnql.zen.utlis.b.** { *; }
+-dontwarn com.google.android.maps.**
+-keep class com.google.android.maps.** { *; }
 
 -assumenosideeffects class com.trnql.zen.utlis.AndroidUtils {
     public static void log(...);
 }
+-dontwarn rx.internal.util.unsafe.**

@@ -2,6 +2,7 @@ package pl.lukmarr.pokemontrainer.entities.fragments;
 
 
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import pl.lukmarr.pokemontrainer.R;
 import pl.lukmarr.pokemontrainer.database.RealmPoke;
 import pl.lukmarr.pokemontrainer.database.RealmPosition;
 import pl.lukmarr.pokemontrainer.utils.MapUtils;
+import pl.lukmarr.pokemontrainer.utils.general.WakeLockManager;
 import pl.lukmarr.pokemontrainer.utils.interfaces.PokemonRefreshable;
 
 public class MapFragment extends Fragment implements PokemonRefreshable {
@@ -39,6 +41,8 @@ public class MapFragment extends Fragment implements PokemonRefreshable {
         // Required empty public constructor
     }
 
+    private static PowerManager.WakeLock wakeLock;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,8 +54,6 @@ public class MapFragment extends Fragment implements PokemonRefreshable {
         View v = inflater.inflate(R.layout.fragment_map, container, false);
         this.view = v;
         ButterKnife.bind(this, v);
-
-
         mapUtils = new MapUtils(getActivity());
 
         lastLatLng = null;
@@ -66,6 +68,7 @@ public class MapFragment extends Fragment implements PokemonRefreshable {
         realm.close();
         refreshMap(lastLatLng);
 
+        WakeLockManager.acquire(wakeLock, this.getActivity());
         return v;
     }
 
@@ -82,6 +85,11 @@ public class MapFragment extends Fragment implements PokemonRefreshable {
     @Override
     public void refreshPokes(List<RealmPoke> pokes) {
         mapUtils.setupMap(R.id.content, lastLatLng, content);
+    }
 
+    @Override
+    public void onDestroyView() {
+        WakeLockManager.releaseWakeLock(wakeLock);
+        super.onDestroyView();
     }
 }

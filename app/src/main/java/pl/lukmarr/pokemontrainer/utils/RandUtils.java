@@ -2,6 +2,7 @@ package pl.lukmarr.pokemontrainer.utils;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -25,23 +26,35 @@ public class RandUtils {
     private RandUtils() {
     }
 
-    public List<LatLng> getPokesNearby(LatLng latLng, int count) {
-
+    public List<LatLng> getPokesNearby(LatLng latLng, int count ) {
         List<LatLng> pairs = new ArrayList<>();
+        float minDist = 10000;
+        float maxDist = 0;
 
         for (int j = 0; j < count; j++) {
-            double radius = random.nextInt(100);
-            radius /= 8000;
+            double radius = random.nextInt(10);
+            radius /= 1200;
+            Log.d(TAG, "radius is " + radius);
             int angle = random.nextInt(360);
 
             double lat = latLng.latitude + radius * Math.sin(Math.toRadians(angle));
             double lon = latLng.longitude + radius * Math.cos(Math.toRadians(angle));
 //            double lon = latLng.longitude + offset();
-            pairs.add(new LatLng(lat, lon));
+            LatLng latLng1 = new LatLng(lat, lon);
+            pairs.add(latLng1);
+            float dist = LocationHelper.distanceBetweenLatLngs(latLng, latLng1);
+            minDist = dist < minDist ? dist : minDist;
+            maxDist = dist > maxDist ? dist : maxDist;
+            Log.d(TAG, "getPokesNearby. Distance between points = " + dist + " meters");
         }
+        Log.d(TAG, "max distance = " + maxDist);
+        Log.d(TAG, "min distance = " + minDist);
+
         return pairs;
 
     }
+
+
 
     public List<LatLng> getPokesNearby2(LatLng latLng, int count) {
         List<LatLng> pairs = new ArrayList<>();

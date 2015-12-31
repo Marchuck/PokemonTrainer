@@ -58,8 +58,8 @@ public class DetailsFragment extends Fragment {
     @OnClick(R.id.clearDataFAB)
     public void clearData() {
         new AlertDialog.Builder(getActivity())
-                .setMessage("Are you sure to clear all progress?. " +
-                        "You will delete all badges and discovered pokes.")
+                .setMessage("Are you sure to clear all progress? " +
+                        "You will delete all badges and discovered pokes and start new game.")
                 .setNegativeButton("Clear", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

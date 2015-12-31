@@ -1,12 +1,10 @@
 package pl.lukmarr.pokemontrainer.connection;
 
-import android.util.Log;
-
 /**
  * Created by Lukasz Marczak on 2015-08-25.
  */
 public class PokeSpritesManager {
-    public static final String TAG = PokeSpritesManager.class.getSimpleName();
+//    public static final String TAG = PokeSpritesManager.class.getSimpleName();
 
     public static String getMainPokeByName(String pokemonName) {
         return "http://img.pokemondb.net/artwork/" + lowerCaseName(pokemonName) + ".jpg";
@@ -24,7 +22,7 @@ public class PokeSpritesManager {
         String firstLetter = String.valueOf(pokemonName.charAt(0)).toUpperCase();
         String lowercase = pokemonName.toLowerCase();
         String reti = firstLetter + lowercase.substring(1);
-        Log.d(TAG, "camelCaseName " + reti);
+//        Log.d(TAG, "camelCaseName " + reti);
         return reti;
     }
 
@@ -42,7 +40,7 @@ public class PokeSpritesManager {
     public static String getPokemonIconByNameAndId(int id, String name) {
         String fixedId = getFixedId(id);
         String fixedName = camelCaseName(name);
-        Log.d(TAG, "id = " + fixedId + "," + fixedName);
+//        Log.d(TAG, "id = " + fixedId + "," + fixedName);
         if (id == 29) {
             return "http://icons.iconarchive.com/icons/hektakun/pokemon/72/" + fixedId + "-Nidoran-icon.png";
         } else if (id == 30) {
@@ -55,8 +53,9 @@ public class PokeSpritesManager {
             return "http://icons.iconarchive.com/icons/hektakun/pokemon/72/" + fixedId + "-Nidorino-icon.png";
         } else if (id == 34) {
             return "http://icons.iconarchive.com/icons/hektakun/pokemon/72/" + fixedId + "-Nidoking-icon.png";
+        } else if (id == 122) {
+            return "http://icons.iconarchive.com/icons/hektakun/pokemon/72/122-Mr-Mime-icon.png";
         }
-
         return "http://icons.iconarchive.com/icons/hektakun/pokemon/72/" + fixedId + "-" + fixedName + "-icon.png";
     }
 
@@ -66,8 +65,6 @@ public class PokeSpritesManager {
         } else if (id < 100) {
             return "0" + id;
         } else return String.valueOf(id);
-
-
     }
 
 }

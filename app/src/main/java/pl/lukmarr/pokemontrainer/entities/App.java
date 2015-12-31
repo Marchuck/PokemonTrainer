@@ -12,6 +12,7 @@ import com.trnql.zen.core.AppData;
 public class App extends AppData {
     public static final String TAG = App.class.getSimpleName();
 
+
     @Override
     public void onCreate() {
         super.onCreate();
