@@ -1,2 +1,6 @@
 # PokemonTrainer
-app which uses GPS...
+
+more description, screenshot and video available here:
+
+http://devpost.com/software/pokes-trainer
+
