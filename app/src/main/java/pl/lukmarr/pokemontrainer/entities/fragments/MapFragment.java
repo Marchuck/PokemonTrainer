@@ -87,6 +87,7 @@ public class MapFragment extends Fragment implements PokemonRefreshable {
         mapUtils.setupMap(R.id.content, lastLatLng, content);
     }
 
+
     @Override
     public void onDestroyView() {
         WakeLockManager.releaseWakeLock(wakeLock);

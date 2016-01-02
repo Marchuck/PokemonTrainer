@@ -1,6 +1,7 @@
 package pl.lukmarr.pokemontrainer.utils;
 
 import android.os.Looper;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
@@ -61,29 +62,12 @@ public class MapUtils {
 
         activity.getSupportFragmentManager().beginTransaction().replace(mapViewHolder, mapFragment)
                 .commitAllowingStateLoss();
-        setupOutdoorPokes(position );
 
+        setupOutdoorPokes(position);
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-
-//                googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-//                    @Override
-//                    public void onMapLongClick(final LatLng latLng) {
-//                        Toast.makeText(activity, "Registering...", Toast.LENGTH_SHORT).show();
-//                        new android.os.Handler().postDelayed(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                LocationHelper.getInstance(activity)
-//                                        .registerNewPokemonWatcher(latLng,
-//                                                RandUtils.create().randomPoke());
-//                                Toast.makeText(activity, "Done.", Toast.LENGTH_SHORT).show();
-//
-//                            }
-//                        }, 3000);
-//                    }
-//                });
 
                 Realm realm = Realm.getInstance(activity);
                 List<OutdoorPoke> pks = realm.where(OutdoorPoke.class).equalTo("poke.isDiscovered", false).findAll();
@@ -97,7 +81,7 @@ public class MapUtils {
         });
     }
 
-    private void setupOutdoorPokes(LatLng position ) {
+    private void setupOutdoorPokes(LatLng position) {
         List<RealmPoke> realmPokes1 = Realm.getInstance(activity)
                 .where(RealmPoke.class).equalTo("isDiscovered", false).findAll();
 
@@ -110,7 +94,7 @@ public class MapUtils {
         for (int j = 0; j < indexes.size(); j++)
             realmPokes.add(realmPokes1.get(indexes.get(j)));
 
-        final List<LatLng> pokesNearby = RandUtils.create().getPokesNearby(position, realLimit   );
+        final List<LatLng> pokesNearby = RandUtils.create().getPokesNearby(position, realLimit);
 
         Realm realm0 = Realm.getInstance(activity);
         RealmResults<OutdoorPoke> outdoorPokes = realm0.where(OutdoorPoke.class).findAll();
@@ -150,11 +134,42 @@ public class MapUtils {
 
     private void addFAB() {
         Log.d(TAG, "add custom FAB  in map utils");
-        relativeLayout.addView(getFAB(), getParams());
+        relativeLayout.addView(getRefreshMapFAB(), getRefreshMapFABParams());
+        relativeLayout.addView(getReloadPokesFAB(relativeLayout), getReloadPokesFABParams());
+    }
+
+    private FloatingActionButton getReloadPokesFAB(final RelativeLayout rl) {
+        FloatingActionButton fab = new FloatingActionButton(activity);
+        FABUtils.setupFAB(activity, fab, R.drawable.cat);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setupNewPokes(rl);
+            }
+        });
+        return fab;
+    }
+
+    private void setupNewPokes(RelativeLayout content) {
+        Realm realm = Realm.getInstance(activity);
+        RealmResults<OutdoorPoke> allPokes = realm.where(OutdoorPoke.class).findAll();
+        realm.beginTransaction();
+        allPokes.clear();
+        realm.commitTransaction();
+        setupOutdoorPokes(lastPosition);
+        refreshMarkersOnly();
+    }
+
+    private RelativeLayout.LayoutParams getReloadPokesFABParams() {
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(70, 70);
+        params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        params.addRule(RelativeLayout.BELOW, getResId(13));
+        params.setMargins(0, 0, 0, 0);
+        return params;
     }
 
     @NonNull
-    RelativeLayout.LayoutParams getParams() {
+    RelativeLayout.LayoutParams getRefreshMapFABParams() {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(70, 70);
         params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 //        params.addRule(RelativeLayout.ALIGN_RIGHT);
@@ -164,8 +179,9 @@ public class MapUtils {
     }
 
     @NonNull
-    FloatingActionButton getFAB() {
+    FloatingActionButton getRefreshMapFAB() {
         FloatingActionButton fab = new FloatingActionButton(activity);
+        fab.setId(getResId(13));
         FABUtils.setupFAB(activity, fab, R.drawable.refresh);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -174,6 +190,12 @@ public class MapUtils {
             }
         });
         return fab;
+    }
+
+    private
+    @IdRes
+    int getResId(int j) {
+        return j;
     }
 
     private void refreshMarkersOnly() {
@@ -215,7 +237,7 @@ public class MapUtils {
         }
 
         tripGoogleMap.animateCamera(CameraUpdateFactory
-                .newCameraPosition(new CameraPosition(position, 16, 60, 0)));
+                .newCameraPosition(new CameraPosition(position, 16, 60, new Random().nextInt(360))));
         Config.wasEmpty = false;
     }
 }
