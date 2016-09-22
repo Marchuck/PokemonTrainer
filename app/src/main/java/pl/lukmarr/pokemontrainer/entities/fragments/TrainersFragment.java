@@ -172,7 +172,7 @@ public class TrainersFragment extends Fragment implements DrawerConnector {
     }
 
     private void setupBackFab() {
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(70, 70);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(-2,-2);
         params.addRule(RelativeLayout.CENTER_VERTICAL);
         params.setMargins(0, 0, 0, 0);
         FloatingActionButton fab = new FloatingActionButton(getActivity());

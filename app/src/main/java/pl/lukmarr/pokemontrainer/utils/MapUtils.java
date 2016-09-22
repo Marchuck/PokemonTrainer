@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -161,7 +162,7 @@ public class MapUtils {
     }
 
     private RelativeLayout.LayoutParams getReloadPokesFABParams() {
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(70, 70);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(-2,-2);
         params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         params.addRule(RelativeLayout.BELOW, getResId(13));
         params.setMargins(0, 0, 0, 0);
@@ -170,7 +171,7 @@ public class MapUtils {
 
     @NonNull
     RelativeLayout.LayoutParams getRefreshMapFABParams() {
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(70, 70);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(-2,-2);
         params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 //        params.addRule(RelativeLayout.ALIGN_RIGHT);
         params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
@@ -192,9 +193,9 @@ public class MapUtils {
         return fab;
     }
 
-    private
+
     @IdRes
-    int getResId(int j) {
+    private int getResId(int j) {
         return j;
     }
 

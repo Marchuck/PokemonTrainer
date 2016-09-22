@@ -173,6 +173,8 @@ public class MainActivity extends SmartCompatActivity {
 
     Fragment getFragment(int j) {
         Config.currentFragmentId = j;
+        pokemonRefreshable = null;
+        drawerConnector = null;
         switch (j) {
             case -1:
                 return WaitFragment.newInstance();
@@ -188,7 +190,7 @@ public class MainActivity extends SmartCompatActivity {
                 return BadgesFragment.newInstance();
             case 3:
                 TrainersFragment fr = TrainersFragment.newInstance();
-
+                drawerConnector = fr;
                 return fr;
             case 4:
                 return DetailsFragment.newInstance();
