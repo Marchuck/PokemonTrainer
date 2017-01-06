@@ -5,6 +5,8 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.util.List;
 
 import io.realm.Realm;
@@ -12,6 +14,8 @@ import pl.lukmarr.pokemontrainer.database.RealmPoke;
 import pl.lukmarr.pokemontrainer.model.Pokemon;
 import pl.lukmarr.pokemontrainer.utils.PokeUtils;
 import pl.lukmarr.pokemontrainer.utils.interfaces.ListCallback;
+import retrofit.RestAdapter;
+import retrofit.converter.GsonConverter;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
@@ -38,8 +42,11 @@ public class DataFetcher {
 
     public void fetchPokes(final Activity a, List<Integer> ids, @Nullable final ListCallback<RealmPoke> listener) {
         Log.d(TAG, "fetchPokes ");
-        GenericAdapter<Pokemon> pokemonAdapter = new GenericAdapter<>(PokeService.POKEAPI_ENDPOINT, Pokemon.class);
-        final PokeService service = pokemonAdapter.adapter.create(PokeService.class);
+        RestAdapter pokemonAdapter = new RestAdapter.Builder()
+                .setEndpoint(PokeService.POKEAPI_ENDPOINT)
+                .setConverter(new GsonConverter(new Gson()))
+                .build();
+        final PokeService service = pokemonAdapter.create(PokeService.class);
         fetchingInProgress = true;
         Observable.from(ids).flatMap(new Func1<Integer, Observable<Pokemon>>() {
             @Override

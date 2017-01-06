@@ -24,8 +24,7 @@ public class WakeLockManager {
 
     public static void releaseWakeLock(PowerManager.WakeLock w) {
         Log.d(TAG, "releaseWakeLock ");
-        if (w != null)
-            w.release();
+        if (w != null) w.release();
         else Log.e(TAG, "releaseWakeLock null");
     }
 }

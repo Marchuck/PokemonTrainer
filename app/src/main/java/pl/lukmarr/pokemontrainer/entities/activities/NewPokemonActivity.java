@@ -76,7 +76,7 @@ public class NewPokemonActivity extends AppCompatActivity {
         AchievementsManager.checkAchievements(this);
     }
 
-    public static Intent buildIntent(RealmPoke pokemon,String message, Activity activity) {
+    public static Intent buildIntent(RealmPoke pokemon, String message, Activity activity) {
         Intent intent = new Intent(activity, NewPokemonActivity.class);
         intent.putExtra("POKEMON_ID", pokemon.getId());
         intent.putExtra("TITLE", message);

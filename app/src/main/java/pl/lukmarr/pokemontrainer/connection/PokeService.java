@@ -19,5 +19,4 @@ public interface PokeService {
     @GET("/api/v1/description/{id}/")
     rx.Observable<PokemonDescription> getPokemonDescription(@Path("id") Integer id);
 
-
 }

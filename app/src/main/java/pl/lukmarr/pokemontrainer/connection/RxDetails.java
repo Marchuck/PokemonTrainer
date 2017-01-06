@@ -3,12 +3,16 @@ package pl.lukmarr.pokemontrainer.connection;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.util.List;
 
 import pl.lukmarr.pokemontrainer.model.Pokemon;
 import pl.lukmarr.pokemontrainer.model.PokemonDescription;
 import pl.lukmarr.pokemontrainer.model.PokeDetail;
 import pl.lukmarr.pokemontrainer.utils.RandUtils;
+import retrofit.RestAdapter;
+import retrofit.converter.GsonConverter;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -29,8 +33,13 @@ public class RxDetails {
 
     public static void fetchDescriptionForId(int id, @NonNull Action1<PokemonDescription> onReceived) {
         d(TAG, "inside fetchDescriptionForId ");
-        GenericAdapter<Pokemon> adapter = new GenericAdapter<>(PokeService.POKEAPI_ENDPOINT, Pokemon.class);
-        adapter.adapter.create(PokeService.class).getPokemonById(id)
+        new RestAdapter
+                .Builder()
+                .setEndpoint(PokeService.POKEAPI_ENDPOINT)
+                .setConverter(new GsonConverter(new Gson()))
+                .build()
+                .create(PokeService.class)
+                .getPokemonById(id)
                 .flatMap(new Func1<Pokemon, Observable<PokemonDescription>>() {
                     @Override
                     public Observable<PokemonDescription> call(Pokemon pokemon) {
@@ -42,10 +51,14 @@ public class RxDetails {
                         for (String s : splittedUri) {
                             Log.d(TAG, "slices : " + s);
                         }
-                        GenericAdapter<PokemonDescription> a =
-                                new GenericAdapter<>(PokeService.POKEAPI_ENDPOINT, PokemonDescription.class);
+
+                        RestAdapter adapter = new RestAdapter.Builder()
+                                .setEndpoint(PokeService.POKEAPI_ENDPOINT)
+                                .setConverter(new GsonConverter(new Gson()))
+                                .build();
+
                         int descriptionId = Integer.valueOf(splittedUri[splittedUri.length - 1]);
-                        return a.adapter.create(PokeService.class).getPokemonDescription(descriptionId);
+                        return adapter.create(PokeService.class).getPokemonDescription(descriptionId);
                     }
                 })
                 .observeOn(Schedulers.trampoline())

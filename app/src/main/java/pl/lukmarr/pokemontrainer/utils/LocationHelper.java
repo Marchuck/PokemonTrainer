@@ -23,11 +23,11 @@ public final class LocationHelper {
     public static final String TAG = LocationHelper.class.getSimpleName();
 
     public static float distanceBetweenLatLngs(LatLng latLng1, LatLng latLng2) {
-        Location loc1 = new Location("");
+        Location loc1 = new Location("a");
         loc1.setLatitude(latLng1.latitude);
         loc1.setLongitude(latLng1.longitude);
 
-        Location loc2 = new Location("");
+        Location loc2 = new Location("b");
         loc2.setLatitude(latLng2.latitude);
         loc2.setLongitude(latLng2.longitude);
 

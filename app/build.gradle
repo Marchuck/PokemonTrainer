@@ -35,7 +35,18 @@ android {
             signingConfig signingConfigs.release
         }
     }
-
+    productFlavors{
+        blue{
+            applicationIdSuffix ".blue"
+            versionNameSuffix "-blue"
+            buildConfigField("String","name","\"Blue\"")
+        }
+        red{
+            applicationIdSuffix ".red"
+            versionNameSuffix "-red"
+            buildConfigField("String","name","\"Red\"")
+        }
+    }
 
 }
 
